@@ -44,9 +44,9 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.GET, "/uploads/**").permitAll()
 				// ---------- ADMIN ----------
 				.requestMatchers("/admin/**").hasRole("ADMIN")
-				.requestMatchers(HttpMethod.POST, "/books/**").hasRole("ADMIN")
-				.requestMatchers(HttpMethod.PUT, "/books/**").hasRole("ADMIN")
-				.requestMatchers(HttpMethod.DELETE, "/books/**").hasRole("ADMIN")
+				.requestMatchers(HttpMethod.POST, "/books/**").hasAnyRole("ADMIN", "VENDOR")
+				.requestMatchers(HttpMethod.PUT, "/books/**").hasAnyRole("ADMIN", "VENDOR")
+				.requestMatchers(HttpMethod.DELETE, "/books/**").hasAnyRole("ADMIN", "VENDOR")
 
 				.requestMatchers(HttpMethod.GET, "/users").hasRole("ADMIN")
 				.requestMatchers(HttpMethod.GET, "/users").hasRole("ADMIN")
