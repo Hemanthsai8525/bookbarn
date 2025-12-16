@@ -48,8 +48,9 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.POST, "/books/**").hasAnyRole("ADMIN", "VENDOR")
 				.requestMatchers(HttpMethod.PUT, "/books/**").hasAnyRole("ADMIN", "VENDOR")
 				.requestMatchers(HttpMethod.DELETE, "/books/**").hasAnyRole("ADMIN", "VENDOR")
+				.requestMatchers(HttpMethod.PATCH, "/admin/vendors/**").hasRole("ADMIN") // Explicitly allow PATCH for
+																							// admins
 
-				.requestMatchers(HttpMethod.GET, "/users").hasRole("ADMIN")
 				.requestMatchers(HttpMethod.GET, "/users").hasRole("ADMIN")
 				.requestMatchers(HttpMethod.DELETE, "/user/**", "/delivery/**").hasRole("ADMIN")
 
@@ -72,18 +73,24 @@ public class SecurityConfig {
 
 		http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
-		// CORS Configuration
-		http.cors(cors -> cors.configurationSource(request -> {
-			var corsConfig = new org.springframework.web.cors.CorsConfiguration();
-			corsConfig.setAllowedOrigins(java.util.List.of("http://localhost:5173", "http://localhost:3000",
-					"https://bookbarnkhs.netlify.app"));
-			corsConfig.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-			corsConfig.setAllowedHeaders(java.util.List.of("*"));
-			corsConfig.setAllowCredentials(true);
-			return corsConfig;
-		}));
+		// Use the Bean defined below
+		http.cors(org.springframework.security.config.Customizer.withDefaults());
 
 		return http.build();
+	}
+
+	@Bean
+	public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
+		org.springframework.web.cors.CorsConfiguration configuration = new org.springframework.web.cors.CorsConfiguration();
+		configuration.setAllowedOrigins(
+				java.util.List.of("http://localhost:5173", "http://localhost:3000", "https://bookbarnkhs.netlify.app"));
+		configuration.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+		configuration.setAllowedHeaders(java.util.List.of("*"));
+		configuration.setAllowCredentials(true);
+
+		org.springframework.web.cors.UrlBasedCorsConfigurationSource source = new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", configuration);
+		return source;
 	}
 
 	@Bean
