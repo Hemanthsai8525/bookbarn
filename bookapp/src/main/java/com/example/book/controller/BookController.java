@@ -50,7 +50,7 @@ public class BookController {
     // ================= CREATE BOOK ====================
     // ================= CREATE BOOK ====================
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody Book book, @javax.servlet.http.HttpServletRequest request) {
+    public ResponseEntity<?> create(@RequestBody Book book, jakarta.servlet.http.HttpServletRequest request) {
         try {
             String role = (String) request.getAttribute("role");
             String username = (String) request.getAttribute("username"); // This is email
@@ -73,13 +73,14 @@ public class BookController {
 
     // ================= UPDATE BOOK ====================
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody Book book, @javax.servlet.http.HttpServletRequest request) {
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody Book book,
+            jakarta.servlet.http.HttpServletRequest request) {
         try {
             // Check ownership
             if (!canEdit(id, request)) {
                 return ResponseEntity.status(403).body("You do not have permission to edit this book");
             }
-            
+
             Book updated = svc.updateBook(id, book);
             return ResponseEntity.ok(updated);
         } catch (RuntimeException e) {
@@ -88,13 +89,14 @@ public class BookController {
     }
 
     @PutMapping("/{id}/stock")
-    public ResponseEntity<?> updateStock(@PathVariable Long id, @RequestBody Map<String, Integer> payload, @javax.servlet.http.HttpServletRequest request) {
+    public ResponseEntity<?> updateStock(@PathVariable Long id, @RequestBody Map<String, Integer> payload,
+            jakarta.servlet.http.HttpServletRequest request) {
         try {
             // Check ownership
             if (!canEdit(id, request)) {
                 return ResponseEntity.status(403).body("You do not have permission to edit this book");
             }
-        
+
             int stock = payload.get("stock");
             return ResponseEntity.ok(svc.updateStock(id, stock));
         } catch (Exception e) {
@@ -133,11 +135,11 @@ public class BookController {
 
     // ================= DELETE BOOK ====================
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id, @javax.servlet.http.HttpServletRequest request) {
+    public ResponseEntity<?> delete(@PathVariable Long id, jakarta.servlet.http.HttpServletRequest request) {
         if (!canEdit(id, request)) {
             return ResponseEntity.status(403).body("You do not have permission to delete this book");
         }
-        
+
         if (svc.findById(id).isPresent()) {
             svc.deleteById(id);
             return ResponseEntity.noContent().build();
@@ -146,21 +148,23 @@ public class BookController {
     }
 
     // Helper to check permissions
-    private boolean canEdit(Long bookId, @javax.servlet.http.HttpServletRequest request) {
+    private boolean canEdit(Long bookId, jakarta.servlet.http.HttpServletRequest request) {
         String role = (String) request.getAttribute("role");
         String username = (String) request.getAttribute("username");
-        
+
         // ADMIN can edit anything
-        if ("ADMIN".equals(role)) return true;
-        
+        if ("ADMIN".equals(role))
+            return true;
+
         // VENDOR can only edit their own books
         if ("VENDOR".equals(role)) {
             return svc.findById(bookId).map(book -> {
-                if (book.getVendor() == null) return false; // Vendor cannot edit system books
+                if (book.getVendor() == null)
+                    return false; // Vendor cannot edit system books
                 return book.getVendor().getEmail().equals(username);
             }).orElse(false);
         }
-        
+
         return false;
     }
 
