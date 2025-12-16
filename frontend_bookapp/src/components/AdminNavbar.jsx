@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { logout } from "../services/auth";
 
@@ -30,3 +30,4 @@ export default function AdminNavbar() {
     </nav>
   );
 }
+

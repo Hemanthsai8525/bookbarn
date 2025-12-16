@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+﻿import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { getCurrentUser, logout } from "../services/auth";
 import { ShoppingCart, BookOpen, Menu, X, Truck, User, LogOut, LayoutDashboard, Package } from "lucide-react";
@@ -309,3 +309,4 @@ export default function Navbar() {
     </>
   );
 }
+

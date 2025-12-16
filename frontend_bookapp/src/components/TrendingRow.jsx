@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import BookCard from "./BookCard";
 
 export default function TrendingRow({ title, items = [], onAdd }) {
@@ -20,3 +20,4 @@ export default function TrendingRow({ title, items = [], onAdd }) {
     </section>
   );
 }
+

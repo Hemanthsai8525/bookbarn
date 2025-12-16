@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import api from "../services/api";
 import { User, Mail, Phone, MapPin, Shield, Edit } from "lucide-react";
 
@@ -111,3 +111,4 @@ export default function VendorProfile() {
         </div>
     );
 }
+

@@ -1,4 +1,4 @@
-// components/CategoryTiles.jsx
+﻿// components/CategoryTiles.jsx
 import React from "react";
 
 export default function CategoryTiles({ categories = [], active, onSelect }) {
@@ -22,3 +22,4 @@ export default function CategoryTiles({ categories = [], active, onSelect }) {
     </div>
   );
 }
+

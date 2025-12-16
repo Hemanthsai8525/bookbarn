@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+﻿import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 export default function OTPInput({ length = 6, onComplete, disabled = false }) {
@@ -87,3 +87,4 @@ export default function OTPInput({ length = 6, onComplete, disabled = false }) {
         </div>
     );
 }
+

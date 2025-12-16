@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import api from "../services/api";
 
 export default function UpdateStockModal({ book, onClose, onUpdate }) {
@@ -50,3 +50,4 @@ export default function UpdateStockModal({ book, onClose, onUpdate }) {
         </div>
     );
 }
+

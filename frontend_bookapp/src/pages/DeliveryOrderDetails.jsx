@@ -30,7 +30,7 @@ export default function DeliveryOrderDetails() {
       const ord = res.data;
       // sort history ascending by time
       if (Array.isArray(ord.history)) {
-        ord.history = ord.history.slice().sort((a,b) => new Date(a.time) - new Date(b.time));
+        ord.history = ord.history.slice().sort((a, b) => new Date(a.time) - new Date(b.time));
       }
       setOrder(ord);
     } catch (err) {
@@ -112,7 +112,7 @@ export default function DeliveryOrderDetails() {
             </div>
             <div className="text-right">
               <div className="text-sm text-gray-500">Total</div>
-              <div className="text-2xl font-bold text-green-700">‚¹ {order.total}</div>
+              <div className="text-2xl font-bold text-green-700">₹ {order.total}</div>
               <div className="mt-3">
                 <span className={`px-3 py-1 rounded-full text-xs font-semibold ${currentStatus === 'DELIVERED' ? 'bg-green-100 text-green-700' : currentStatus === 'SHIPPED' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'}`}>
                   {currentStatus}
@@ -132,8 +132,8 @@ export default function DeliveryOrderDetails() {
                     <div className="text-sm text-gray-500">{it.book?.author || ""}</div>
                   </div>
                   <div className="text-sm text-gray-700">
-                    {it.quantity} Ã— ‚¹ {it.book?.price || 0}
-                    <div className="text-xs text-gray-400">Subtotal ‚¹ {(it.book?.price || 0) * it.quantity}</div>
+                    {it.quantity} × ₹ {it.book?.price || 0}
+                    <div className="text-xs text-gray-400">Subtotal ₹ {(it.book?.price || 0) * it.quantity}</div>
                   </div>
                 </div>
               ))}
@@ -194,4 +194,5 @@ export default function DeliveryOrderDetails() {
     </div>
   );
 }
+
 

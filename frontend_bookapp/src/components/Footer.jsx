@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { Link } from "react-router-dom";
 import { BookOpen, Facebook, Twitter, Instagram, Linkedin, Send, Mail, MapPin, Phone } from "lucide-react";
 import { motion } from "framer-motion";
@@ -91,3 +91,4 @@ export default function Footer() {
     </footer>
   );
 }
+
