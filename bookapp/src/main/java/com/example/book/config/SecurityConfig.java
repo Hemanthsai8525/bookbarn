@@ -42,6 +42,7 @@ public class SecurityConfig {
 				.permitAll()
 				.requestMatchers(HttpMethod.GET, "/books").permitAll()
 				.requestMatchers(HttpMethod.GET, "/uploads/**").permitAll()
+				.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Allow preflight checks
 				// ---------- ADMIN ----------
 				.requestMatchers("/admin/**").hasRole("ADMIN")
 				.requestMatchers(HttpMethod.POST, "/books/**").hasAnyRole("ADMIN", "VENDOR")
