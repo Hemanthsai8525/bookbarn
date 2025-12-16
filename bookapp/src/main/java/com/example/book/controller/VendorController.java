@@ -7,7 +7,15 @@ import com.example.book.service.VendorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping; // Keeping just in case, though unused
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RestController;
 import com.example.book.model.VendorStatus;
 
 import java.util.List;
@@ -98,60 +106,11 @@ public class VendorController {
     @Autowired
     private com.example.book.repository.BookRepository bookRepository;
 
-    // Get Profile
-    @GetMapping("/vendor/profile")
-    public ResponseEntity<?> getVendorProfile(@RequestHeader("Authorization") String token) {
-        String email = jwtService.extractUsername(token.substring(7));
-        Vendor vendor = vendorService.getVendorByEmail(email);
-        if (vendor == null)
-            return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(vendor);
-    }
-
-    // Update Profile
-    @PutMapping("/vendor/profile")
-    public ResponseEntity<?> updateVendorProfile(@RequestHeader("Authorization") String token,
-            @RequestBody Map<String, String> updates) {
-        String email = jwtService.extractUsername(token.substring(7));
-        Vendor vendor = vendorService.getVendorByEmail(email);
-        if (vendor == null)
-            return ResponseEntity.notFound().build();
-
-        if (updates.containsKey("name"))
-            vendor.setName(updates.get("name"));
-        if (updates.containsKey("phone"))
-            vendor.setPhone(updates.get("phone"));
-        if (updates.containsKey("address"))
-            vendor.setAddress(updates.get("address"));
-
-        // Handle password update if provided
-        if (updates.containsKey("password") && !updates.get("password").isEmpty()) {
-            vendor.setPassword(passwordEncoder.encode(updates.get("password")));
-        }
-
-        // We need to save the vendor. VendorService might not have a simple save method
-        // exposed if it's just register.
-        // Let's use a repository if Service doesn't have it, but ideally Service should
-        // handle this.
-        // Checking VendorRepository... injected in AdminController but not here
-        // properly?
-        // Ah, only VendorService is here. Let's see if VendorService has save/update.
-        // If not, I'll inject VendorRepository here too or add update method to
-        // Service.
-        // For speed, I'll direct inject Repo or add method.
-        // Let's assume I can add a method to VendorService or use Repo.
-        // VendorService was viewed in conversation history, it had registerVendor.
-        // I will inject VendorRepository here as well since I used BookRepository
-        // directly too.
-
-        return ResponseEntity.ok(vendorRepository.save(vendor));
-    }
-
     @Autowired
     private com.example.book.repository.VendorRepository vendorRepository;
 
-    // Get My Books
-    @GetMapping("/vendor/my-books")
+    // Get Profile
+    @GetMapping("/vendor/profile")
     public ResponseEntity<?> getMyBooks(@RequestHeader("Authorization") String token) {
         // Extract email from token
         String email = jwtService.extractUsername(token.substring(7));
