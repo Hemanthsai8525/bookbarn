@@ -76,7 +76,7 @@ public class SecurityConfig {
 			var corsConfig = new org.springframework.web.cors.CorsConfiguration();
 			corsConfig.setAllowedOrigins(java.util.List.of("http://localhost:5173", "http://localhost:3000",
 					"https://bookbarnkhs.netlify.app"));
-			corsConfig.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+			corsConfig.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
 			corsConfig.setAllowedHeaders(java.util.List.of("*"));
 			corsConfig.setAllowCredentials(true);
 			return corsConfig;
