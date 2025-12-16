@@ -35,7 +35,7 @@ export default function AdminVendors() {
         setVendors(vendors.map(v => v.id === id ? { ...v, status: action === 'approve' ? 'APPROVED' : 'REJECTED' } : v));
 
         try {
-            await api.patch(`/admin/vendors/${id}/${action}`);
+            await api.post(`/admin/vendors/${id}/${action}`);
             setMessage(`Vendor ${action}d successfully`);
             setTimeout(() => setMessage(""), 3000);
         } catch (err) {

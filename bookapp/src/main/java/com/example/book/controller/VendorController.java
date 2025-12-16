@@ -229,13 +229,13 @@ public class VendorController {
     }
 
     // Admin: Approve
-    @PatchMapping("/admin/vendors/{id}/approve")
+    @PostMapping("/admin/vendors/{id}/approve")
     public ResponseEntity<?> approve(@PathVariable Long id) {
         return ResponseEntity.ok(vendorService.approveVendor(id));
     }
 
     // Admin: Reject
-    @PatchMapping("/admin/vendors/{id}/reject")
+    @PostMapping("/admin/vendors/{id}/reject")
     public ResponseEntity<?> reject(@PathVariable Long id) {
         return ResponseEntity.ok(vendorService.rejectVendor(id));
     }

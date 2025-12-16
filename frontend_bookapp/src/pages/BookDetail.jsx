@@ -111,8 +111,8 @@ export default function BookDetail() {
               </p>
 
               <div className="flex items-end gap-4 mb-8">
-                <div className="text-5xl font-black text-amber-700">‚¹{book.price}</div>
-                {book.oldPrice && <div className="text-xl text-gray-400 line-through mb-1">‚¹{book.oldPrice}</div>}
+                <div className="text-5xl font-black text-amber-700">₹{book.price}</div>
+                {book.oldPrice && <div className="text-xl text-gray-400 line-through mb-1">₹{book.oldPrice}</div>}
               </div>
 
               {/* Stock Badge */}

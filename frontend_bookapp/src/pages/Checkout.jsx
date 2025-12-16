@@ -101,7 +101,7 @@ export default function Checkout() {
                 <div className="space-y-3 pb-4 border-b border-gray-100">
                   <div className="flex justify-between text-gray-600">
                     <span>Items Total</span>
-                    <span>‚¹{state?.total}</span>
+                    <span>₹{state?.total}</span>
                   </div>
                   <div className="flex justify-between text-green-600 text-sm">
                     <span>Shipping</span>
@@ -110,7 +110,7 @@ export default function Checkout() {
                 </div>
                 <div className="flex justify-between text-xl font-bold text-gray-900 mt-4">
                   <span>Total</span>
-                  <span>‚¹{state?.total}</span>
+                  <span>₹{state?.total}</span>
                 </div>
               </div>
 
