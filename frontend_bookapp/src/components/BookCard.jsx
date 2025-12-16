@@ -67,7 +67,7 @@ export default function BookCard({ book, onAdd }) {
         <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
           <div className="flex flex-col">
             <span className="text-xs text-gray-400 uppercase tracking-wide font-semibold">Price</span>
-            <span className="text-xl font-bold text-amber-700">â‚¹{book.price}</span>
+            <span className="text-xl font-bold text-amber-700">‚¹{book.price}</span>
           </div>
 
           {!isAdmin && (
@@ -92,4 +92,5 @@ export default function BookCard({ book, onAdd }) {
     </motion.article>
   );
 }
+
 

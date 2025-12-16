@@ -204,7 +204,7 @@ export default function ForgotPassword() {
                         </div>
 
                         <button onClick={() => setStep(1)} className="w-full text-gray-600 py-2 hover:text-gray-900">
-                            â† Change email
+                            † Change email
                         </button>
                     </div>
                 )}
@@ -250,4 +250,5 @@ export default function ForgotPassword() {
         </div>
     );
 }
+
 

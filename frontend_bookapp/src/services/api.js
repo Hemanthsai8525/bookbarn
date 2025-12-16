@@ -1,4 +1,4 @@
-import axios from "axios";
+﻿import axios from "axios";
 import { logout } from "./auth";
 
 const api = axios.create({
@@ -52,7 +52,7 @@ api.interceptors.response.use(
     }
 
     // -----------------------------------------------
-    // If delivery token is expired/invalid (401 OR 403) → log out
+    // If delivery token is expired/invalid (401 OR 403) †’ log out
     // -----------------------------------------------
     if (status === 401 || status === 403) {
       if (localStorage.getItem("deliveryToken")) {
@@ -76,7 +76,7 @@ api.interceptors.response.use(
       }
 
       // -----------------------------------------------
-      // IF NORMAL USER → USE REFRESH TOKEN
+      // IF NORMAL USER †’ USE REFRESH TOKEN
       // -----------------------------------------------
       const refreshToken = localStorage.getItem("refreshToken");
       if (!refreshToken) {
@@ -114,3 +114,4 @@ api.interceptors.response.use(
 );
 
 export default api;
+

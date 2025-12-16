@@ -156,7 +156,7 @@ export default function VendorDashboard() {
                             </div>
                         </div>
                         <h3 className="text-gray-500 text-sm font-bold mt-4">Portfolio Value</h3>
-                        <p className="text-3xl font-bold text-gray-900">â‚¹{portfolioValue.toLocaleString()}</p>
+                        <p className="text-3xl font-bold text-gray-900">‚¹{portfolioValue.toLocaleString()}</p>
                     </motion.div>
                 </div>
 
@@ -239,7 +239,7 @@ export default function VendorDashboard() {
                                     <p className="text-sm text-gray-500 mb-4">{b.author}</p>
 
                                     <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-50">
-                                        <span className="font-bold text-lg text-gray-900">â‚¹{b.price}</span>
+                                        <span className="font-bold text-lg text-gray-900">‚¹{b.price}</span>
                                         <div className={`flex items-center gap-1.5 text-xs font-bold px-2 py-1 rounded-lg ${b.stock < 5 ? "bg-red-50 text-red-600" : "bg-emerald-50 text-emerald-700"}`}>
                                             <Package size={14} /> {b.stock} Left
                                         </div>
@@ -292,7 +292,7 @@ export default function VendorDashboard() {
                                     <div className="col-span-2 md:col-span-1 space-y-4">
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
-                                                <label className="text-sm font-bold text-gray-700 mb-1 block">Price (â‚¹)</label>
+                                                <label className="text-sm font-bold text-gray-700 mb-1 block">Price (‚¹)</label>
                                                 <input name="price" type="number" value={formData.price} className="input-field" onChange={handleInputChange} required placeholder="0.00" />
                                             </div>
                                             <div>
@@ -325,4 +325,5 @@ export default function VendorDashboard() {
         </div>
     );
 }
+
 

@@ -166,8 +166,8 @@ export default function Cart() {
                           </button>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-lg text-amber-700">â‚¹{book.price * item.quantity}</p>
-                          <p className="text-xs text-gray-400">â‚¹{book.price} / each</p>
+                          <p className="font-bold text-lg text-amber-700">‚¹{book.price * item.quantity}</p>
+                          <p className="text-xs text-gray-400">‚¹{book.price} / each</p>
                         </div>
                       </div>
                     </div>
@@ -185,22 +185,22 @@ export default function Cart() {
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between text-gray-600">
                   <span>Subtotal</span>
-                  <span>â‚¹{subtotal}</span>
+                  <span>‚¹{subtotal}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Shipping estimate</span>
                   <span className={shipping === 0 ? "text-green-600 font-medium" : ""}>
-                    {shipping === 0 ? "Free" : `â‚¹${shipping}`}
+                    {shipping === 0 ? "Free" : `‚¹${shipping}`}
                   </span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Tax (5%)</span>
-                  <span>â‚¹{tax}</span>
+                  <span>‚¹{tax}</span>
                 </div>
                 <div className="h-px bg-gray-100 my-2"></div>
                 <div className="flex justify-between text-xl font-bold text-gray-900">
                   <span>Order Total</span>
-                  <span>â‚¹{total}</span>
+                  <span>‚¹{total}</span>
                 </div>
               </div>
 
@@ -221,4 +221,5 @@ export default function Cart() {
     </div>
   );
 }
+
 

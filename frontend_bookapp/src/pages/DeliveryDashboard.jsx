@@ -1,4 +1,4 @@
-// src/pages/DeliveryDashboard.jsx
+﻿// src/pages/DeliveryDashboard.jsx
 import React, { useEffect, useState } from "react";
 import api from "../services/api";
 import { useNavigate } from "react-router-dom";
@@ -119,7 +119,7 @@ export default function DeliveryDashboard() {
                 <div className="flex justify-between items-center">
                   <div>
                     <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">Order #{o.id}</span>
-                    <h4 className="text-lg font-bold text-gray-800 mt-1">Assigned — Ready for delivery</h4>
+                    <h4 className="text-lg font-bold text-gray-800 mt-1">Assigned €” Ready for delivery</h4>
                   </div>
                   <span className={`px-3 py-1 rounded-full text-xs font-bold ${o.status === 'DELIVERED' ? 'bg-green-100 text-green-700' : o.status === 'SHIPPED' ? 'bg-blue-100 text-blue-700' : 'bg-indigo-100 text-indigo-700'}`}>
                     {o.status}
@@ -127,8 +127,8 @@ export default function DeliveryDashboard() {
                 </div>
 
                 <div className="mt-4 flex items-center justify-between text-sm text-gray-500">
-                  <div>{o.items?.length || 0} items • ₹ {o.total}</div>
-                  <div className="text-indigo-500">View details →</div>
+                  <div>{o.items?.length || 0} items €¢ ‚¹ {o.total}</div>
+                  <div className="text-indigo-500">View details †’</div>
                 </div>
               </div>
             ))}
@@ -168,3 +168,4 @@ export default function DeliveryDashboard() {
     </div>
   );
 }
+

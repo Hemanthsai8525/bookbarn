@@ -180,7 +180,7 @@ export default function AdminBooks() {
                       </div>
                       <div className="grid grid-cols-2 gap-6">
                         <div>
-                          <label className="text-sm font-bold text-gray-700 mb-1 block">Price (â‚¹)</label>
+                          <label className="text-sm font-bold text-gray-700 mb-1 block">Price (‚¹)</label>
                           <input type="number" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} className="input-field" placeholder="0.00" />
                         </div>
                         <div>
@@ -291,7 +291,7 @@ export default function AdminBooks() {
                   </div>
 
                   <div className="flex items-center justify-between p-3 bg-gray-50 rounded-2xl border border-gray-100">
-                    <div className="text-xl font-black text-gray-900">â‚¹{b.price}</div>
+                    <div className="text-xl font-black text-gray-900">‚¹{b.price}</div>
                     <button
                       onClick={() => setStockEditing(b)}
                       className={`text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors ${b.stock < 5 ? "bg-red-100 text-red-700" : "bg-white text-gray-600 shadow-sm"}`}
@@ -313,4 +313,5 @@ export default function AdminBooks() {
     </Layout>
   );
 }
+
 

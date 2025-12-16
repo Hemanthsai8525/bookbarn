@@ -44,7 +44,7 @@ export default function DeliveryRegister() {
     if (!form.phone) {
       err.phone = "Phone number is required";
     } else if (!phoneRegex.test(form.phone)) {
-      err.phone = "Phone must be 10 digits (start 6â€“9)";
+      err.phone = "Phone must be 10 digits (start 6€“9)";
     }
 
     if (!form.area.trim()) err.area = "Delivery area is required";
@@ -307,7 +307,7 @@ export default function DeliveryRegister() {
               onClick={() => setStep(1)}
               className="w-full text-gray-600 font-medium py-2 hover:text-gray-900 transition-colors"
             >
-              â† Back to form
+              † Back to form
             </button>
           </div>
         )}
@@ -320,4 +320,5 @@ export default function DeliveryRegister() {
     </div>
   );
 }
+
 

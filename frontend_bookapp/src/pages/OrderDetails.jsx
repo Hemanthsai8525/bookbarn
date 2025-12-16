@@ -181,7 +181,7 @@ export default function OrderDetails() {
                             Qty: {item.quantity}
                           </div>
                           <div className="text-lg font-bold text-amber-700">
-                            â‚¹{(item.book?.price || 0) * item.quantity}
+                            ‚¹{(item.book?.price || 0) * item.quantity}
                           </div>
                         </div>
                       </div>
@@ -193,7 +193,7 @@ export default function OrderDetails() {
                 <div className="bg-gray-50 px-8 py-6 space-y-3">
                   <div className="flex justify-between text-gray-600">
                     <span>Subtotal</span>
-                    <span>â‚¹{order.total}</span>
+                    <span>‚¹{order.total}</span>
                   </div>
                   <div className="flex justify-between text-green-600 font-medium">
                     <span>Shipping</span>
@@ -201,7 +201,7 @@ export default function OrderDetails() {
                   </div>
                   <div className="border-t border-gray-200 pt-3 flex justify-between text-xl font-bold text-gray-900">
                     <span>Order Total</span>
-                    <span>â‚¹{order.total}</span>
+                    <span>‚¹{order.total}</span>
                   </div>
                 </div>
               </div>
@@ -282,18 +282,19 @@ export default function OrderDetails() {
               <tr key={i.id} className="border-b">
                 <td className="p-3">{i.book?.title}</td>
                 <td className="p-3">{i.quantity}</td>
-                <td className="p-3">â‚¹{i.book?.price}</td>
-                <td className="p-3">â‚¹{(i.book?.price || 0) * i.quantity}</td>
+                <td className="p-3">‚¹{i.book?.price}</td>
+                <td className="p-3">‚¹{(i.book?.price || 0) * i.quantity}</td>
               </tr>
             ))}
           </tbody>
         </table>
 
         <div className="text-right text-2xl font-bold">
-          Total: â‚¹{order.total}
+          Total: ‚¹{order.total}
         </div>
       </div>
     </Layout>
   );
 }
+
 

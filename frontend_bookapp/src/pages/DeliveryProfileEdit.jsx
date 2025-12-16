@@ -234,7 +234,7 @@ export default function DeliveryProfileEdit() {
                 </div>
                 {form.password && (
                   <p className="text-xs text-blue-600 mt-1 ml-1">
-                    âš ï¸ Changing password will require OTP verification
+                    š ï¸ Changing password will require OTP verification
                   </p>
                 )}
               </div>
@@ -321,4 +321,5 @@ export default function DeliveryProfileEdit() {
     </div>
   );
 }
+
 

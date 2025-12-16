@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import api from "../services/api";
 import BookCard from "../components/BookCard";
 import TrendingRow from "../components/TrendingRow";
@@ -229,7 +229,7 @@ export default function Books() {
                       </div>
                       <div>
                         <h2 className="text-3xl font-bold text-gray-900 font-serif">Special Deals</h2>
-                        <p className="text-gray-500">Books under ₹500</p>
+                        <p className="text-gray-500">Books under ‚¹500</p>
                       </div>
                     </div>
                     <TrendingRow items={onSale} onAdd={addToCart} />
@@ -290,3 +290,4 @@ export default function Books() {
     </div>
   );
 }
+

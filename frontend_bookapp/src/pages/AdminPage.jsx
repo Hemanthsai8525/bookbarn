@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import { getCurrentUser, logout } from "../services/auth";
@@ -65,7 +65,7 @@ export default function AdminPage() {
 
   return (
     <>
-      {/* ✅ ONLY ADMIN NAVBAR AT TOP */}
+      {/* œ… ONLY ADMIN NAVBAR AT TOP */}
       <AdminNavbar />
 
       {/* ---- Admin Page Content ---- */}
@@ -74,3 +74,4 @@ export default function AdminPage() {
     </>
   );
 }
+
