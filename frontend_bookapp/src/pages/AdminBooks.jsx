@@ -180,7 +180,7 @@ export default function AdminBooks() {
                       </div>
                       <div className="grid grid-cols-2 gap-6">
                         <div>
-                          <label className="text-sm font-bold text-gray-700 mb-1 block">Price (‚¹)</label>
+                          <label className="text-sm font-bold text-gray-700 mb-1 block">Price (₹)</label>
                           <input type="number" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} className="input-field" placeholder="0.00" />
                         </div>
                         <div>
