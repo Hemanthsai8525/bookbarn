@@ -41,7 +41,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 path.startsWith("/vendors/forgot-password") ||
                 path.startsWith("/vendors/reset-password") ||
                 path.startsWith("/otp/") ||
-                path.startsWith("/books") ||
+
                 path.startsWith("/uploads/")) {
             chain.doFilter(request, response);
             return;
