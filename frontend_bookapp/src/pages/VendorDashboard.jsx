@@ -156,7 +156,7 @@ export default function VendorDashboard() {
                             </div>
                         </div>
                         <h3 className="text-gray-500 text-sm font-bold mt-4">Portfolio Value</h3>
-                        <p className="text-3xl font-bold text-gray-900">‚¹{portfolioValue.toLocaleString()}</p>
+                        <p className="text-3xl font-bold text-gray-900">₹{portfolioValue.toLocaleString()}</p>
                     </motion.div>
                 </div>
 

@@ -109,10 +109,42 @@ public class VendorController {
     @Autowired
     private com.example.book.repository.VendorRepository vendorRepository;
 
-    // Get Profile
+    // Get Profile (Vendor Details)
     @GetMapping("/vendor/profile")
-    public ResponseEntity<?> getMyBooks(@RequestHeader("Authorization") String token) {
-        // Extract email from token
+    public ResponseEntity<?> getProfile(@RequestHeader("Authorization") String token) {
+        String email = jwtService.extractUsername(token.substring(7));
+        Vendor vendor = vendorService.getVendorByEmail(email);
+        if (vendor == null)
+            return ResponseEntity.badRequest().body("Vendor not found");
+
+        return ResponseEntity.ok(vendor);
+    }
+
+    // Update Profile
+    @PutMapping("/vendor/profile")
+    public ResponseEntity<?> updateProfile(@RequestHeader("Authorization") String token,
+            @RequestBody Map<String, String> body) {
+        String email = jwtService.extractUsername(token.substring(7));
+        Vendor vendor = vendorService.getVendorByEmail(email);
+        if (vendor == null)
+            return ResponseEntity.badRequest().body("Vendor not found");
+
+        if (body.get("name") != null)
+            vendor.setName(body.get("name"));
+        if (body.get("phone") != null)
+            vendor.setPhone(body.get("phone"));
+        if (body.get("address") != null)
+            vendor.setAddress(body.get("address"));
+        if (body.get("password") != null && !body.get("password").isEmpty()) {
+            vendor.setPassword(passwordEncoder.encode(body.get("password")));
+        }
+
+        return ResponseEntity.ok(vendorRepository.save(vendor));
+    }
+
+    // Get My Books
+    @GetMapping("/vendor/my-books")
+    public ResponseEntity<?> getVendorBooks(@RequestHeader("Authorization") String token) {
         String email = jwtService.extractUsername(token.substring(7));
         Vendor vendor = vendorService.getVendorByEmail(email);
         if (vendor == null)
