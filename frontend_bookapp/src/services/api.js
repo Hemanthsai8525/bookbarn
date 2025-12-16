@@ -2,7 +2,7 @@ import axios from "axios";
 import { logout } from "./auth";
 
 const api = axios.create({
-  baseURL: bookapp - production - 3e11.up.railway.app,
+  baseURL: "https://bookapp-production-3e11.up.railway.app",
 });
 
 // -----------------------------------------------------------
@@ -89,7 +89,7 @@ api.interceptors.response.use(
         originalRequest._retry = true;
 
         const res = await axios.post(
-          "http://localhost:8080/user/refresh",
+          "https://bookapp-production-3e11.up.railway.app/user/refresh",
           { refreshToken }
         );
 

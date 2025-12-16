@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ShoppingCart } from "lucide-react";
@@ -21,7 +21,7 @@ export default function BookCard({ book, onAdd }) {
           src={
             book.image?.startsWith("http")
               ? book.image
-              : `http://localhost:8080${book.image}`
+              : `https://bookapp-production-3e11.up.railway.app${book.image}`
           }
           alt={book.title}
           className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 ${isOutOfStock ? "grayscale opacity-60" : ""
@@ -67,7 +67,7 @@ export default function BookCard({ book, onAdd }) {
         <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
           <div className="flex flex-col">
             <span className="text-xs text-gray-400 uppercase tracking-wide font-semibold">Price</span>
-            <span className="text-xl font-bold text-amber-700">₹{book.price}</span>
+            <span className="text-xl font-bold text-amber-700">â‚¹{book.price}</span>
           </div>
 
           {!isAdmin && (
@@ -92,3 +92,4 @@ export default function BookCard({ book, onAdd }) {
     </motion.article>
   );
 }
+

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { BookOpen, LogOut, Package, Plus, Search, DollarSign, Image as ImageIcon, X, TrendingUp, Edit2, Trash2 } from "lucide-react";
@@ -30,7 +30,7 @@ export default function VendorDashboard() {
     const fetchMyBooks = async () => {
         setLoading(true);
         try {
-            const res = await axios.get("http://localhost:8080/vendor/my-books", {
+            const res = await axios.get("https://bookapp-production-3e11.up.railway.app/vendor/my-books", {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setBooks(res.data);
@@ -70,12 +70,12 @@ export default function VendorDashboard() {
         e.preventDefault();
         try {
             if (isEditing) {
-                await axios.put(`http://localhost:8080/vendor/books/${currentBookId}`, formData, {
+                await axios.put(`https://bookapp-production-3e11.up.railway.app/vendor/books/${currentBookId}`, formData, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setMessage("Book updated successfully!");
             } else {
-                await axios.post("http://localhost:8080/vendor/books", formData, {
+                await axios.post("https://bookapp-production-3e11.up.railway.app/vendor/books", formData, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setMessage("Book added successfully!");
@@ -92,7 +92,7 @@ export default function VendorDashboard() {
     const handleDelete = async (id) => {
         if (!window.confirm("Are you sure you want to delete this book?")) return;
         try {
-            await axios.delete(`http://localhost:8080/vendor/books/${id}`, {
+            await axios.delete(`https://bookapp-production-3e11.up.railway.app/vendor/books/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setMessage("Book deleted successfully!");
@@ -156,7 +156,7 @@ export default function VendorDashboard() {
                             </div>
                         </div>
                         <h3 className="text-gray-500 text-sm font-bold mt-4">Portfolio Value</h3>
-                        <p className="text-3xl font-bold text-gray-900">₹{portfolioValue.toLocaleString()}</p>
+                        <p className="text-3xl font-bold text-gray-900">â‚¹{portfolioValue.toLocaleString()}</p>
                     </motion.div>
                 </div>
 
@@ -222,7 +222,7 @@ export default function VendorDashboard() {
 
                                 <div className="h-48 bg-gray-100 relative overflow-hidden">
                                     {b.image ? (
-                                        <img src={b.image.startsWith('http') ? b.image : `http://localhost:8080${b.image}`} alt={b.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                        <img src={b.image.startsWith('http') ? b.image : `https://bookapp-production-3e11.up.railway.app${b.image}`} alt={b.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                                     ) : (
                                         <div className="flex items-center justify-center h-full text-gray-400">
                                             <ImageIcon size={32} />
@@ -239,7 +239,7 @@ export default function VendorDashboard() {
                                     <p className="text-sm text-gray-500 mb-4">{b.author}</p>
 
                                     <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-50">
-                                        <span className="font-bold text-lg text-gray-900">₹{b.price}</span>
+                                        <span className="font-bold text-lg text-gray-900">â‚¹{b.price}</span>
                                         <div className={`flex items-center gap-1.5 text-xs font-bold px-2 py-1 rounded-lg ${b.stock < 5 ? "bg-red-50 text-red-600" : "bg-emerald-50 text-emerald-700"}`}>
                                             <Package size={14} /> {b.stock} Left
                                         </div>
@@ -292,7 +292,7 @@ export default function VendorDashboard() {
                                     <div className="col-span-2 md:col-span-1 space-y-4">
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
-                                                <label className="text-sm font-bold text-gray-700 mb-1 block">Price (₹)</label>
+                                                <label className="text-sm font-bold text-gray-700 mb-1 block">Price (â‚¹)</label>
                                                 <input name="price" type="number" value={formData.price} className="input-field" onChange={handleInputChange} required placeholder="0.00" />
                                             </div>
                                             <div>
@@ -325,3 +325,4 @@ export default function VendorDashboard() {
         </div>
     );
 }
+

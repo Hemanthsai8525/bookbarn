@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { updateProfile } from "../services/auth";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -46,7 +46,7 @@ export default function UpdateProfile() {
   async function sendOTP() {
     setSendingOTP(true);
     try {
-      await axios.post("http://localhost:8080/otp/send-reset", { email: form.email });
+      await axios.post("https://bookapp-production-3e11.up.railway.app/otp/send-reset", { email: form.email });
       setOtpSent(true);
 
       const toast = document.createElement("div");
@@ -64,7 +64,7 @@ export default function UpdateProfile() {
   async function verifyOTPAndUpdate(otpValue) {
     setSaving(true);
     try {
-      const verifyRes = await axios.post("http://localhost:8080/otp/verify", {
+      const verifyRes = await axios.post("https://bookapp-production-3e11.up.railway.app/otp/verify", {
         email: form.email,
         otp: otpValue
       });
@@ -101,7 +101,7 @@ export default function UpdateProfile() {
   async function resendOTP() {
     setSendingOTP(true);
     try {
-      await axios.post("http://localhost:8080/otp/resend", {
+      await axios.post("https://bookapp-production-3e11.up.railway.app/otp/resend", {
         email: form.email,
         purpose: "Profile Update"
       });
@@ -204,7 +204,7 @@ export default function UpdateProfile() {
               <div className="pt-4 border-t border-gray-100">
                 <label className="block text-sm font-bold text-gray-700 mb-1.5">
                   New Password (Optional)
-                  <span className="text-xs font-normal text-amber-600 ml-2">🔒 Requires OTP verification</span>
+                  <span className="text-xs font-normal text-amber-600 ml-2">ðŸ”’ Requires OTP verification</span>
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
@@ -219,7 +219,7 @@ export default function UpdateProfile() {
                 </div>
                 {form.password && (
                   <p className="text-xs text-amber-600 mt-1 ml-1">
-                    ⚠️ Changing password will require OTP verification
+                    âš ï¸ Changing password will require OTP verification
                   </p>
                 )}
               </div>
@@ -260,7 +260,7 @@ export default function UpdateProfile() {
 
             <div className="space-y-6">
               <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-800 text-center">
-                <p className="font-semibold mb-1">📧 Check your email</p>
+                <p className="font-semibold mb-1">ðŸ“§ Check your email</p>
                 <p className="text-xs">Code expires in 10 minutes</p>
               </div>
 
@@ -306,3 +306,4 @@ export default function UpdateProfile() {
     </div>
   );
 }
+

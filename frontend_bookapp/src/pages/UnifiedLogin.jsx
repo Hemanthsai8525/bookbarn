@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { login } from "../services/auth";
 import { User, Lock, Mail, ArrowRight, Loader2, Store, Truck } from "lucide-react";
@@ -70,7 +70,7 @@ export default function UnifiedLogin() {
                 }
             } else if (userType === "vendor") {
                 // Vendor login
-                const res = await axios.post("http://localhost:8080/vendors/login", {
+                const res = await axios.post("https://bookapp-production-3e11.up.railway.app/vendors/login", {
                     email: form.input,
                     password: form.password
                 });
@@ -79,7 +79,7 @@ export default function UnifiedLogin() {
                 nav("/vendor/dashboard");
             } else if (userType === "delivery") {
                 // Delivery agent login
-                const res = await axios.post("http://localhost:8080/delivery/login", {
+                const res = await axios.post("https://bookapp-production-3e11.up.railway.app/delivery/login", {
                     email: form.input,
                     password: form.password
                 });
@@ -262,3 +262,4 @@ export default function UnifiedLogin() {
         </div>
     );
 }
+

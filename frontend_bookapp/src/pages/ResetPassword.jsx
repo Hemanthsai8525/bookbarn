@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import axios from 'axios';
 import { ArrowLeft, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -19,9 +19,9 @@ export default function ResetPassword() {
         setError('');
 
         let url = '';
-        if (userType === 'user') url = 'http://localhost:8080/user/reset-password';
-        if (userType === 'vendor') url = 'http://localhost:8080/vendors/reset-password';
-        if (userType === 'delivery') url = 'http://localhost:8080/delivery/reset-password';
+        if (userType === 'user') url = 'https://bookapp-production-3e11.up.railway.app/user/reset-password';
+        if (userType === 'vendor') url = 'https://bookapp-production-3e11.up.railway.app/vendors/reset-password';
+        if (userType === 'delivery') url = 'https://bookapp-production-3e11.up.railway.app/delivery/reset-password';
 
         try {
             await axios.post(url, { token, newPassword });
@@ -101,3 +101,4 @@ export default function ResetPassword() {
         </div>
     );
 }
+

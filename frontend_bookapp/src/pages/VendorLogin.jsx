@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -16,7 +16,7 @@ export default function VendorLogin() {
         setError("");
 
         try {
-            const res = await axios.post("http://localhost:8080/vendors/login", creds);
+            const res = await axios.post("https://bookapp-production-3e11.up.railway.app/vendors/login", creds);
             const { token, name, role } = res.data;
 
             localStorage.setItem("vendorToken", token);
@@ -73,3 +73,4 @@ export default function VendorLogin() {
         </div>
     );
 }
+

@@ -1,4 +1,4 @@
-// src/pages/OrderDetails.jsx
+﻿// src/pages/OrderDetails.jsx
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import api from "../services/api";
@@ -163,7 +163,7 @@ export default function OrderDetails() {
                     <div key={item.id} className="p-6 flex gap-6 hover:bg-gray-50 transition-colors">
                       <div className="w-20 h-28 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
                         <img
-                          src={item.book?.image?.startsWith('http') ? item.book.image : `http://localhost:8080${item.book.image}`}
+                          src={item.book?.image?.startsWith('http') ? item.book.image : `https://bookapp-production-3e11.up.railway.app${item.book.image}`}
                           className="w-full h-full object-cover"
                           alt=""
                         />
@@ -181,7 +181,7 @@ export default function OrderDetails() {
                             Qty: {item.quantity}
                           </div>
                           <div className="text-lg font-bold text-amber-700">
-                            ₹{(item.book?.price || 0) * item.quantity}
+                            â‚¹{(item.book?.price || 0) * item.quantity}
                           </div>
                         </div>
                       </div>
@@ -193,7 +193,7 @@ export default function OrderDetails() {
                 <div className="bg-gray-50 px-8 py-6 space-y-3">
                   <div className="flex justify-between text-gray-600">
                     <span>Subtotal</span>
-                    <span>₹{order.total}</span>
+                    <span>â‚¹{order.total}</span>
                   </div>
                   <div className="flex justify-between text-green-600 font-medium">
                     <span>Shipping</span>
@@ -201,7 +201,7 @@ export default function OrderDetails() {
                   </div>
                   <div className="border-t border-gray-200 pt-3 flex justify-between text-xl font-bold text-gray-900">
                     <span>Order Total</span>
-                    <span>₹{order.total}</span>
+                    <span>â‚¹{order.total}</span>
                   </div>
                 </div>
               </div>
@@ -282,17 +282,18 @@ export default function OrderDetails() {
               <tr key={i.id} className="border-b">
                 <td className="p-3">{i.book?.title}</td>
                 <td className="p-3">{i.quantity}</td>
-                <td className="p-3">₹{i.book?.price}</td>
-                <td className="p-3">₹{(i.book?.price || 0) * i.quantity}</td>
+                <td className="p-3">â‚¹{i.book?.price}</td>
+                <td className="p-3">â‚¹{(i.book?.price || 0) * i.quantity}</td>
               </tr>
             ))}
           </tbody>
         </table>
 
         <div className="text-right text-2xl font-bold">
-          Total: ₹{order.total}
+          Total: â‚¹{order.total}
         </div>
       </div>
     </Layout>
   );
 }
+

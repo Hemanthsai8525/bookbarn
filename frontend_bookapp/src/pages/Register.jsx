@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import api from "../services/api";
 import axios from "axios";
@@ -47,7 +47,7 @@ export default function Register() {
     if (!form.phone) {
       err.phone = "Phone number is required";
     } else if (!phoneRegex.test(form.phone)) {
-      err.phone = "Phone must be 10 digits (start 6–9)";
+      err.phone = "Phone must be 10 digits (start 6â€“9)";
     }
 
     // Strong password validation
@@ -69,7 +69,7 @@ export default function Register() {
     setErrors({});
 
     try {
-      await axios.post("http://localhost:8080/otp/send-registration", {
+      await axios.post("https://bookapp-production-3e11.up.railway.app/otp/send-registration", {
         email: form.email
       });
 
@@ -95,7 +95,7 @@ export default function Register() {
 
     try {
       // Verify OTP
-      const verifyRes = await axios.post("http://localhost:8080/otp/verify", {
+      const verifyRes = await axios.post("https://bookapp-production-3e11.up.railway.app/otp/verify", {
         email: form.email,
         otp: otpValue
       });
@@ -120,7 +120,7 @@ export default function Register() {
   async function resendOTP() {
     setLoading(true);
     try {
-      await axios.post("http://localhost:8080/otp/resend", {
+      await axios.post("https://bookapp-production-3e11.up.railway.app/otp/resend", {
         email: form.email,
         purpose: "Registration"
       });
@@ -277,7 +277,7 @@ export default function Register() {
             )}
 
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-800 text-center">
-              <p className="font-semibold mb-1">📧 Check your email</p>
+              <p className="font-semibold mb-1">ðŸ“§ Check your email</p>
               <p className="text-xs">We've sent a 6-digit code to <strong>{form.email}</strong></p>
               <p className="text-xs mt-1 text-blue-600">Code expires in 10 minutes</p>
             </div>
@@ -308,7 +308,7 @@ export default function Register() {
               onClick={() => setStep(1)}
               className="w-full text-gray-600 font-medium py-2 hover:text-gray-900 transition-colors"
             >
-              ← Back to form
+              â† Back to form
             </button>
           </div>
         )}
@@ -321,3 +321,4 @@ export default function Register() {
     </div>
   );
 }
+

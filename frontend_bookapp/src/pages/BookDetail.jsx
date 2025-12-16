@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../services/api";
 import { motion } from "framer-motion";
@@ -88,7 +88,7 @@ export default function BookDetail() {
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.5 }}
-                src={book.image?.startsWith("http") ? book.image : `http://localhost:8080${book.image}`}
+                src={book.image?.startsWith("http") ? book.image : `https://bookapp-production-3e11.up.railway.app${book.image}`}
                 alt={book.title}
                 className="relative w-3/5 shadow-2xl rounded-r-lg transform group-hover:scale-105 transition-transform duration-500"
               />
@@ -111,8 +111,8 @@ export default function BookDetail() {
               </p>
 
               <div className="flex items-end gap-4 mb-8">
-                <div className="text-5xl font-black text-amber-700">₹{book.price}</div>
-                {book.oldPrice && <div className="text-xl text-gray-400 line-through mb-1">₹{book.oldPrice}</div>}
+                <div className="text-5xl font-black text-amber-700">â‚¹{book.price}</div>
+                {book.oldPrice && <div className="text-xl text-gray-400 line-through mb-1">â‚¹{book.oldPrice}</div>}
               </div>
 
               {/* Stock Badge */}
@@ -162,3 +162,4 @@ export default function BookDetail() {
     </div>
   );
 }
+

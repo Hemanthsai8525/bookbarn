@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import api from "../services/api";
 import Layout from "../components/Layout";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -77,7 +77,7 @@ export default function OrderSummary() {
                   return (
                     <div key={idx} className="flex gap-4 items-center">
                       <img
-                        src={details.image?.startsWith('http') ? details.image : `http://localhost:8080${details.image}`}
+                        src={details.image?.startsWith('http') ? details.image : `https://bookapp-production-3e11.up.railway.app${details.image}`}
                         className="w-16 h-20 object-cover rounded-md shadow-sm bg-gray-100"
                         alt=""
                       />
@@ -86,7 +86,7 @@ export default function OrderSummary() {
                         <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
                       </div>
                       <div className="font-bold text-lg text-amber-700">
-                        ₹{details.price * item.quantity}
+                        â‚¹{details.price * item.quantity}
                       </div>
                     </div>
                   );
@@ -97,7 +97,7 @@ export default function OrderSummary() {
             <div className="bg-gray-50 p-8 border-t border-gray-200">
               <div className="flex justify-between items-center mb-6">
                 <span className="text-gray-600 font-medium">Total Amount</span>
-                <span className="text-3xl font-black text-gray-900">₹{total}</span>
+                <span className="text-3xl font-black text-gray-900">â‚¹{total}</span>
               </div>
 
               <button
@@ -119,3 +119,4 @@ export default function OrderSummary() {
     </Layout>
   );
 }
+
