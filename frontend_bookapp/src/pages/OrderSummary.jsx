@@ -86,7 +86,7 @@ export default function OrderSummary() {
                         <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
                       </div>
                       <div className="font-bold text-lg text-amber-700">
-                        ‚¹{details.price * item.quantity}
+                        ₹ {details.price * item.quantity}
                       </div>
                     </div>
                   );
@@ -97,7 +97,7 @@ export default function OrderSummary() {
             <div className="bg-gray-50 p-8 border-t border-gray-200">
               <div className="flex justify-between items-center mb-6">
                 <span className="text-gray-600 font-medium">Total Amount</span>
-                <span className="text-3xl font-black text-gray-900">‚¹{total}</span>
+                <span className="text-3xl font-black text-gray-900">₹{total}</span>
               </div>
 
               <button
@@ -119,6 +119,5 @@ export default function OrderSummary() {
     </Layout>
   );
 }
-
 
 
