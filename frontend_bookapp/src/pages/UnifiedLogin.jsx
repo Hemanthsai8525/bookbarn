@@ -62,6 +62,12 @@ export default function UnifiedLogin() {
         try {
             if (userType === "user") {
                 // Regular user login
+                // Clear other tokens to prevent role confusion
+                localStorage.removeItem("vendorToken");
+                localStorage.removeItem("vendorName");
+                localStorage.removeItem("deliveryToken");
+                localStorage.removeItem("deliveryAgent");
+
                 const userData = await login(form.input, form.password);
                 if (userData.user.role === "ADMIN") {
                     nav("/admin/dashboard");
@@ -70,6 +76,13 @@ export default function UnifiedLogin() {
                 }
             } else if (userType === "vendor") {
                 // Vendor login
+                // Clear other tokens
+                localStorage.removeItem("accessToken");
+                localStorage.removeItem("refreshToken");
+                localStorage.removeItem("user");
+                localStorage.removeItem("deliveryToken");
+                localStorage.removeItem("deliveryAgent");
+
                 const res = await axios.post("https://bookapp-production-3e11.up.railway.app/vendors/login", {
                     email: form.input,
                     password: form.password
@@ -79,6 +92,13 @@ export default function UnifiedLogin() {
                 nav("/vendor/dashboard");
             } else if (userType === "delivery") {
                 // Delivery agent login
+                // Clear other tokens
+                localStorage.removeItem("accessToken");
+                localStorage.removeItem("refreshToken");
+                localStorage.removeItem("user");
+                localStorage.removeItem("vendorToken");
+                localStorage.removeItem("vendorName");
+
                 const res = await axios.post("https://bookapp-production-3e11.up.railway.app/delivery/login", {
                     email: form.input,
                     password: form.password
@@ -165,8 +185,8 @@ export default function UnifiedLogin() {
 
                 <div className="text-center mb-8">
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white mx-auto shadow-lg mb-4 ${userType === 'user' ? 'bg-amber-600 shadow-amber-600/30' :
-                            userType === 'vendor' ? 'bg-emerald-600 shadow-emerald-600/30' :
-                                'bg-blue-600 shadow-blue-600/30'
+                        userType === 'vendor' ? 'bg-emerald-600 shadow-emerald-600/30' :
+                            'bg-blue-600 shadow-blue-600/30'
                         }`}>
                         <IconComponent size={24} />
                     </div>
@@ -186,8 +206,8 @@ export default function UnifiedLogin() {
                     <div>
                         <div className="relative group">
                             <Mail className={`absolute left-4 top-3.5 text-gray-400 transition-colors ${userType === 'user' ? 'group-focus-within:text-amber-600' :
-                                    userType === 'vendor' ? 'group-focus-within:text-emerald-600' :
-                                        'group-focus-within:text-blue-600'
+                                userType === 'vendor' ? 'group-focus-within:text-emerald-600' :
+                                    'group-focus-within:text-blue-600'
                                 }`} size={20} />
                             <input
                                 type="text"
@@ -195,8 +215,8 @@ export default function UnifiedLogin() {
                                 onChange={(e) => setForm({ ...form, input: e.target.value })}
                                 placeholder={userType === "user" ? "Username / Email / Phone" : "Email Address"}
                                 className={`w-full pl-12 pr-4 py-3 rounded-xl bg-white/50 border border-gray-200 outline-none transition-all ${userType === 'user' ? 'focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10' :
-                                        userType === 'vendor' ? 'focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10' :
-                                            'focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10'
+                                    userType === 'vendor' ? 'focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10' :
+                                        'focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10'
                                     }`}
                             />
                         </div>
@@ -207,8 +227,8 @@ export default function UnifiedLogin() {
                     <div>
                         <div className="relative group">
                             <Lock className={`absolute left-4 top-3.5 text-gray-400 transition-colors ${userType === 'user' ? 'group-focus-within:text-amber-600' :
-                                    userType === 'vendor' ? 'group-focus-within:text-emerald-600' :
-                                        'group-focus-within:text-blue-600'
+                                userType === 'vendor' ? 'group-focus-within:text-emerald-600' :
+                                    'group-focus-within:text-blue-600'
                                 }`} size={20} />
                             <input
                                 type="password"
@@ -216,8 +236,8 @@ export default function UnifiedLogin() {
                                 onChange={(e) => setForm({ ...form, password: e.target.value })}
                                 placeholder="Password"
                                 className={`w-full pl-12 pr-4 py-3 rounded-xl bg-white/50 border border-gray-200 outline-none transition-all ${userType === 'user' ? 'focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10' :
-                                        userType === 'vendor' ? 'focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10' :
-                                            'focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10'
+                                    userType === 'vendor' ? 'focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10' :
+                                        'focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10'
                                     }`}
                             />
                         </div>
@@ -227,14 +247,14 @@ export default function UnifiedLogin() {
                     <div className="flex items-center justify-between text-sm">
                         <label className="flex items-center gap-2 text-gray-600 cursor-pointer">
                             <input type="checkbox" className={`rounded ${userType === 'user' ? 'text-amber-600 focus:ring-amber-500' :
-                                    userType === 'vendor' ? 'text-emerald-600 focus:ring-emerald-500' :
-                                        'text-blue-600 focus:ring-blue-500'
+                                userType === 'vendor' ? 'text-emerald-600 focus:ring-emerald-500' :
+                                    'text-blue-600 focus:ring-blue-500'
                                 }`} />
                             Remember me
                         </label>
                         <Link to="/forgot-password" className={`font-semibold hover:underline ${userType === 'user' ? 'text-amber-700' :
-                                userType === 'vendor' ? 'text-emerald-700' :
-                                    'text-blue-700'
+                            userType === 'vendor' ? 'text-emerald-700' :
+                                'text-blue-700'
                             }`}>Forgot password?</Link>
                     </div>
 
@@ -242,8 +262,8 @@ export default function UnifiedLogin() {
                         type="submit"
                         disabled={loading}
                         className={`w-full text-white font-bold py-3.5 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed ${userType === 'user' ? 'bg-amber-700 shadow-amber-700/20 hover:bg-amber-800' :
-                                userType === 'vendor' ? 'bg-emerald-700 shadow-emerald-700/20 hover:bg-emerald-800' :
-                                    'bg-blue-700 shadow-blue-700/20 hover:bg-blue-800'
+                            userType === 'vendor' ? 'bg-emerald-700 shadow-emerald-700/20 hover:bg-emerald-800' :
+                                'bg-blue-700 shadow-blue-700/20 hover:bg-blue-800'
                             }`}
                     >
                         {loading ? <Loader2 className="animate-spin" /> : "Sign In"}
@@ -254,8 +274,8 @@ export default function UnifiedLogin() {
                 <p className="text-center text-gray-600 mt-8">
                     Don't have an account?
                     <Link to={config.registerLink} className={`font-bold hover:underline ml-1 ${userType === 'user' ? 'text-amber-700' :
-                            userType === 'vendor' ? 'text-emerald-700' :
-                                'text-blue-700'
+                        userType === 'vendor' ? 'text-emerald-700' :
+                            'text-blue-700'
                         }`}>Sign up</Link>
                 </p>
             </motion.div>
