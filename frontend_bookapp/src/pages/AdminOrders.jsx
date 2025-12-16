@@ -128,7 +128,7 @@ export default function AdminOrders() {
                     </div>
                     <div>
                       <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Amount</p>
-                      <p className="font-bold text-gray-900 text-lg">‚¹{order.total}</p>
+                      <p className="font-bold text-gray-900 text-lg">₹{order.total}</p>
                     </div>
                     <div>
                       <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Status</p>

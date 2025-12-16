@@ -291,7 +291,7 @@ export default function AdminBooks() {
                   </div>
 
                   <div className="flex items-center justify-between p-3 bg-gray-50 rounded-2xl border border-gray-100">
-                    <div className="text-xl font-black text-gray-900">‚¹{b.price}</div>
+                    <div className="text-xl font-black text-gray-900">₹{b.price}</div>
                     <button
                       onClick={() => setStockEditing(b)}
                       className={`text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors ${b.stock < 5 ? "bg-red-100 text-red-700" : "bg-white text-gray-600 shadow-sm"}`}

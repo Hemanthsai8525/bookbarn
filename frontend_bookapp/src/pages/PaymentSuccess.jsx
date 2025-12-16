@@ -64,7 +64,7 @@ export default function PaymentSuccess() {
             <div className="space-y-4 mb-8">
               <div className="flex justify-between py-3 border-b border-gray-100">
                 <span className="text-gray-500">Amount Paid</span>
-                <span className="font-bold text-xl text-gray-900">‚¹{order.total}</span>
+                <span className="font-bold text-xl text-gray-900">₹{order.total}</span>
               </div>
               <div className="flex justify-between py-2">
                 <span className="text-gray-500">Transaction ID</span>

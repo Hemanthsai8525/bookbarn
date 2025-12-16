@@ -95,7 +95,7 @@ export default function Orders() {
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-2xl font-bold text-gray-900">‚¹{order.total}</p>
+                        <p className="text-2xl font-bold text-gray-900">₹{order.total}</p>
                         <p className="text-xs text-gray-400">Total Amount</p>
                       </div>
                     </div>

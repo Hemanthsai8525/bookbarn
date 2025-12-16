@@ -136,7 +136,7 @@ export default function Payment() {
           <div className="p-8 space-y-6">
             <div className="flex justify-between items-center border-b pb-4">
               <span className="text-gray-600 font-medium">Total Amount</span>
-              <span className="text-2xl font-bold text-gray-900">‚¹{state?.total}</span>
+              <span className="text-2xl font-bold text-gray-900">₹{state?.total}</span>
             </div>
 
             {/* Mock Card Form */}

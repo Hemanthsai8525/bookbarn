@@ -67,7 +67,7 @@ export default function AdminDashboard() {
   }, []);
 
   const KPIs = [
-    { label: "Total Revenue", value: `‚¹${stats.revenue.toLocaleString()}`, icon: IndianRupee, color: "from-amber-400 to-orange-500", lightColor: "bg-amber-100 text-amber-600" },
+    { label: "Total Revenue", value: `₹${stats.revenue.toLocaleString()}`, icon: IndianRupee, color: "from-amber-400 to-orange-500", lightColor: "bg-amber-100 text-amber-600" },
     { label: "Active Orders", value: stats.orders, icon: ShoppingBag, color: "from-blue-400 to-indigo-500", lightColor: "bg-blue-100 text-blue-600" },
     { label: "Books in Stock", value: stats.books, icon: BookOpen, color: "from-emerald-400 to-teal-500", lightColor: "bg-emerald-100 text-emerald-600" },
     { label: "Vendors / Users", value: `${stats.vendors || 0} / ${stats.users}`, icon: Users, color: "from-violet-400 to-purple-500", lightColor: "bg-violet-100 text-violet-600" },
@@ -176,7 +176,7 @@ export default function AdminDashboard() {
                       dy={10}
                     />
                     <YAxis
-                      prefix="‚¹"
+                      prefix="₹"
                       stroke="#9CA3AF"
                       fontSize={12}
                       tickLine={false}
