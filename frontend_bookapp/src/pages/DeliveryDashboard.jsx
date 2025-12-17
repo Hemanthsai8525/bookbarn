@@ -29,7 +29,7 @@ export default function DeliveryDashboard() {
       const token = localStorage.getItem("deliveryToken");
       if (!token) {
         console.error("No delivery token found. Redirecting to login.");
-        navigate("/delivery/login");
+        navigate("/login");
         return;
       }
 
