@@ -2,7 +2,6 @@
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import { getCurrentUser, logout } from "../services/auth";
-import AdminNavbar from "../components/AdminNavbar";  
 
 export default function AdminPage() {
   const [books, setBooks] = useState([]);
@@ -65,14 +64,8 @@ export default function AdminPage() {
 
   return (
     <>
-      {/* œ… ONLY ADMIN NAVBAR AT TOP */}
-      <AdminNavbar />
-
       {/* ---- Admin Page Content ---- */}
-      
 
     </>
   );
 }
-
-
