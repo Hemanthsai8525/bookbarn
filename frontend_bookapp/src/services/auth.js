@@ -1,5 +1,5 @@
 ﻿import api from "./api";
-import { jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 
 
@@ -7,8 +7,13 @@ export async function login(input, password) {
   const res = await axios.post("https://bookapp-production-3e11.up.railway.app/user/login", { input, password });
 
   const data = res.data;
- console.log("LOGIN RESPONSE:", res.data);
+  console.log("LOGIN RESPONSE:", res.data);
 
+  // IMPORTANT: Clear all other tokens first to prevent conflicts
+  localStorage.removeItem("deliveryToken");
+  localStorage.removeItem("deliveryAgent");
+  localStorage.removeItem("vendorToken");
+  localStorage.removeItem("vendorName");
 
   localStorage.setItem("accessToken", data.accessToken);
   localStorage.setItem("refreshToken", data.refreshToken);
@@ -33,9 +38,18 @@ export async function updateProfile(userId, data) {
 
 
 export function logout() {
+  // Clear user tokens
   localStorage.removeItem("accessToken");
   localStorage.removeItem("refreshToken");
   localStorage.removeItem("user");
+
+  // Clear delivery agent tokens
+  localStorage.removeItem("deliveryToken");
+  localStorage.removeItem("deliveryAgent");
+
+  // Clear vendor tokens
+  localStorage.removeItem("vendorToken");
+  localStorage.removeItem("vendorName");
 }
 
 export function getCurrentUser() {
@@ -69,5 +83,4 @@ export async function refreshAccessToken() {
     window.location.href = "/login";
   }
 }
-
 
