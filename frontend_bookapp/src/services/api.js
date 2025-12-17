@@ -62,7 +62,7 @@ api.interceptors.response.use(
         localStorage.removeItem("deliveryToken");
         localStorage.removeItem("deliveryAgent");
 
-        window.location.replace("/delivery/login");
+        window.location.replace("/login");
         return Promise.reject(error);
       }
 
