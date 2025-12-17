@@ -9,7 +9,7 @@ const api = axios.create({
 // REQUEST INTERCEPTOR (Attach correct token automatically)
 // -----------------------------------------------------------
 api.interceptors.request.use((config) => {
-  const deliveryToken = localStorage.getItem("accessToken");
+  const deliveryToken = localStorage.getItem("deliveryToken");
   const vendorToken = localStorage.getItem("vendorToken");
   const userToken = localStorage.getItem("accessToken");
 
