@@ -37,6 +37,12 @@ export default function DeliveryLogin() {
       //   agent: { id, name, email, phone, area }
       // }
 
+      // IMPORTANT: Clear all other tokens first to prevent conflicts
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("user");
+      localStorage.removeItem("vendorToken");
+      localStorage.removeItem("vendorName");
 
       localStorage.setItem("deliveryToken", res.data.accessToken);
       localStorage.setItem("deliveryAgent", JSON.stringify(res.data.agent));

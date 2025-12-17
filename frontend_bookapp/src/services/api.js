@@ -56,22 +56,24 @@ api.interceptors.response.use(
     // -----------------------------------------------
     if (status === 401 || status === 403) {
       if (localStorage.getItem("deliveryToken")) {
-        console.warn("Delivery session invalid (401/403). Logging out.");
+        console.warn("▲ Delivery session invalid (401/403).");
+        console.warn("Logging out.");
 
         localStorage.removeItem("deliveryToken");
         localStorage.removeItem("deliveryAgent");
 
-        window.location.replace("/login");
+        window.location.replace("/delivery/login");
         return Promise.reject(error);
       }
 
       if (localStorage.getItem("vendorToken")) {
-        console.warn("Vendor session invalid (401/403). Logging out.");
+        console.warn("▲ Vendor session invalid (401/403).");
+        console.warn("Logging out.");
 
         localStorage.removeItem("vendorToken");
         localStorage.removeItem("vendorName");
 
-        window.location.replace("/login");
+        window.location.replace("/vendors/login");
         return Promise.reject(error);
       }
 

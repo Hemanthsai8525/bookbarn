@@ -25,9 +25,20 @@ export default function DeliveryDashboard() {
 
     setLoading(true);
     try {
+      // Check if token exists
+      const token = localStorage.getItem("deliveryToken");
+      if (!token) {
+        console.error("No delivery token found. Redirecting to login.");
+        navigate("/delivery/login");
+        return;
+      }
+
+      console.log("Fetching assigned orders for agent:", agent.id);
       // assigned to this agent
       const aRes = await api.get(`/delivery/assigned/${agent.id}`);
       const assignedData = Array.isArray(aRes.data) ? aRes.data : [];
+      console.log("Assigned orders received:", assignedData.length);
+
       // keep only ASSIGNED and SHIPPED (as requested)
       const assignedFiltered = assignedData.filter(o =>
         ["ASSIGNED", "SHIPPED", "OUT_FOR_DELIVERY"].includes((o.status || "").toUpperCase())
@@ -42,6 +53,11 @@ export default function DeliveryDashboard() {
       setAvailable(availableFiltered);
     } catch (err) {
       console.error("Load orders failed:", err);
+      console.error("Error response:", err.response?.data);
+      console.error("Error status:", err.response?.status);
+
+      // If it's an auth error, the interceptor will handle redirect
+      // Otherwise, just show empty state
       setAssigned([]);
       setAvailable([]);
     } finally {

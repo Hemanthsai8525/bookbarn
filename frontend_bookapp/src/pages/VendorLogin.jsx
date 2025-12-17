@@ -19,6 +19,13 @@ export default function VendorLogin() {
             const res = await axios.post("https://bookapp-production-3e11.up.railway.app/vendors/login", creds);
             const { token, name, role } = res.data;
 
+            // IMPORTANT: Clear all other tokens first to prevent conflicts
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("refreshToken");
+            localStorage.removeItem("user");
+            localStorage.removeItem("deliveryToken");
+            localStorage.removeItem("deliveryAgent");
+
             localStorage.setItem("vendorToken", token);
             localStorage.setItem("vendorName", name);
             // We can reuse user token storage if we want unified auth, but separating is safer for now 
