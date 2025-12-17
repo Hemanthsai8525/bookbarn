@@ -113,6 +113,12 @@ export default function BookDetail() {
               <p className="text-lg text-gray-500 mb-8 font-medium flex items-center gap-2">
                 By <span className="text-gray-900 underline decoration-amber-300 decoration-2 underline-offset-2">{book.author}</span>
               </p>
+              {book.vendor && (
+                <div className="mb-6 flex items-center gap-2 text-sm text-gray-600 bg-amber-50 px-3 py-1.5 rounded-lg w-fit border border-amber-100">
+                  <span className="font-semibold text-amber-800">Vendor:</span>
+                  <span>{book.vendor.name}</span>
+                </div>
+              )}
 
               <div className="flex items-end gap-4 mb-8">
                 <div className="text-5xl font-black text-amber-700">₹{book.price}</div>

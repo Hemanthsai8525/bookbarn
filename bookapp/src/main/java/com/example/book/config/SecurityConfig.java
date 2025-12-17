@@ -62,6 +62,7 @@ public class SecurityConfig {
 				// ---------- AUTHENTICATED USERS ----------
 				.requestMatchers("/user/me").hasAnyRole("USER", "ADMIN")
 				.requestMatchers(HttpMethod.PUT, "/user/*/update-profile").hasAnyRole("USER", "ADMIN")
+				.requestMatchers("/notifications/**").hasAnyRole("VENDOR", "ADMIN")
 
 				// agent endpoints -> require DELIVERY_AGENT role
 				.requestMatchers("/delivery/login", "/delivery/register").permitAll()

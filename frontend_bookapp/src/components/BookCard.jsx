@@ -64,6 +64,11 @@ export default function BookCard({ book, onAdd }) {
             </h3>
           </Link>
           <p className="text-sm text-gray-500 mt-1 font-medium">{book.author}</p>
+          {book.vendor && (
+            <p className="text-xs text-amber-600 mt-1 font-medium flex items-center gap-1">
+              <span>Sold by:</span> <span className="underline">{book.vendor.name}</span>
+            </p>
+          )}
         </div>
 
         <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">

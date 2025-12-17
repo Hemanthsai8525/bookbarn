@@ -21,19 +21,22 @@ public class OrderService {
 	private final BookRepository bookRepo;
 	private final OrderHistoryRepository historyRepo;
 	private final BookService bookService;
+	private final com.example.book.repository.NotificationRepository notificationRepo;
 
 	public OrderService(OrderRepository repo, CartRepository cartRepo, BookRepository bookRepo,
-			OrderHistoryRepository historyRepo, BookService bookService) {
+			OrderHistoryRepository historyRepo, BookService bookService,
+			com.example.book.repository.NotificationRepository notificationRepo) {
 		this.repo = repo;
 		this.cartRepo = cartRepo;
 		this.bookRepo = bookRepo;
 		this.historyRepo = historyRepo;
 		this.bookService = bookService;
+		this.notificationRepo = notificationRepo;
 	}
 
 	// ------------------ PLACE ORDER ------------------
 	@jakarta.transaction.Transactional
-	public Order placeOrder(Long userId, String address, String phone) {
+	public Order placeOrder(Long userId, String address, String phone, String paymentMethod) {
 
 		if (userId == null)
 			throw new RuntimeException("Invalid user");
@@ -59,6 +62,7 @@ public class OrderService {
 		order.setTotal(total);
 		order.setAddress(address);
 		order.setPhone(phone);
+		order.setPaymentMethod(paymentMethod != null ? paymentMethod : "CARD"); // Default to CARD if null
 		order.setStatus("PENDING");
 
 		Order savedOrder = repo.save(order);
@@ -66,6 +70,15 @@ public class OrderService {
 		for (CartItem ci : items) {
 			ci.setOrder(savedOrder);
 			cartRepo.save(ci);
+
+			// Notify Vendor
+			if (ci.getBook() != null && ci.getBook().getVendor() != null) {
+				String msg = "New Order #" + savedOrder.getId() + ": " + ci.getQuantity() + " x "
+						+ ci.getBook().getTitle();
+				com.example.book.model.Notification n = new com.example.book.model.Notification(msg,
+						ci.getBook().getVendor());
+				notificationRepo.save(n);
+			}
 		}
 
 		OrderHistory history = new OrderHistory("PENDING", savedOrder);

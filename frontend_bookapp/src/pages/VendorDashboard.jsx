@@ -19,13 +19,42 @@ export default function VendorDashboard() {
     const navigate = useNavigate();
     const token = localStorage.getItem("vendorToken");
 
+    const [notifications, setNotifications] = useState([]);
+
     useEffect(() => {
         if (!token) {
             navigate("/login");
             return;
         }
         fetchMyBooks();
+        fetchNotifications();
     }, [token]);
+
+    const fetchNotifications = async () => {
+        try {
+            // Need vendor ID first, usually stored or decoded from token. 
+            // For now, let's assume we can get it or we have an endpoint 'my-notifications'
+            // Since we don't have 'my-notifications' endpoint, we need to decode token or fetch profile first.
+            // Let's rely on stored "vendor" object if available, or fetch profile.
+
+            // Re-using profile endpoint or decoding token is best practice, 
+            // but for speed let's just use the profile endpoint if it exists or parse from localStorage if you stored it.
+            // Checking if vendorId is in localStorage
+
+            // Fallback: fetch profile to get ID
+            const profileRes = await axios.get("https://bookapp-production-3e11.up.railway.app/vendor/profile", {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const vendorId = profileRes.data.id;
+
+            const res = await axios.get(`https://bookapp-production-3e11.up.railway.app/notifications/vendor/${vendorId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setNotifications(res.data);
+        } catch (err) {
+            console.error("Failed to fetch notifications", err);
+        }
+    }
 
     const fetchMyBooks = async () => {
         setLoading(true);
@@ -158,6 +187,30 @@ export default function VendorDashboard() {
                         <h3 className="text-gray-500 text-sm font-bold mt-4">Portfolio Value</h3>
                         <p className="text-3xl font-bold text-gray-900">₹{portfolioValue.toLocaleString()}</p>
                     </motion.div>
+                </div>
+
+                {/* Notifications Section */}
+                <div className="mb-10">
+                    <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        Recent Notifications
+                    </h3>
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        {notifications.length === 0 ? (
+                            <div className="p-6 text-center text-gray-500">No new notifications</div>
+                        ) : (
+                            <div className="divide-y divide-gray-100 max-h-60 overflow-y-auto">
+                                {notifications.map((n) => (
+                                    <div key={n.id} className="p-4 hover:bg-gray-50 flex items-start gap-3 transition-colors">
+                                        <div className="mt-1 w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />
+                                        <div>
+                                            <p className="text-gray-800 font-medium text-sm">{n.message}</p>
+                                            <p className="text-xs text-gray-400 mt-1">{new Date(n.timestamp).toLocaleString()}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {/* Actions & Search */}

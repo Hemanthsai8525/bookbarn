@@ -42,7 +42,8 @@ public class OrderController {
             return org.springframework.http.ResponseEntity.ok(svc.placeOrder(
                     req.getUserId(),
                     req.getAddress(),
-                    req.getPhone()));
+                    req.getPhone(),
+                    req.getPaymentMethod()));
         } catch (Exception e) {
             return org.springframework.http.ResponseEntity.badRequest().body(e.getMessage());
         }

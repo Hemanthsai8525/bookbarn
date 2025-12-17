@@ -113,6 +113,13 @@ export default function DeliveryOrderDetails() {
             <div className="text-right">
               <div className="text-sm text-gray-500">Total</div>
               <div className="text-2xl font-bold text-green-700">₹ {order.total}</div>
+              <div className="text-sm font-medium mt-1 text-gray-600">
+                {order.paymentMethod === 'COD' ? (
+                  <span className="text-red-600 bg-red-50 px-2 py-0.5 rounded border border-red-100">Collect Cash</span>
+                ) : (
+                  <span className="text-gray-500 bg-gray-100 px-2 py-0.5 rounded">Prepaid</span>
+                )}
+              </div>
               <div className="mt-3">
                 <span className={`px-3 py-1 rounded-full text-xs font-semibold ${currentStatus === 'DELIVERED' ? 'bg-green-100 text-green-700' : currentStatus === 'SHIPPED' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'}`}>
                   {currentStatus}

@@ -29,6 +29,7 @@ public class Order {
 	private String address;
 	private String phone;
 	private String status; // PENDING, CONFIRMED, SHIPPED, PICKED_UP, DELIVERED, CANCELLED
+	private String paymentMethod; // CARD, COD
 
 	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
 	@JsonManagedReference
@@ -37,11 +38,10 @@ public class Order {
 	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JsonManagedReference
 	private List<CartItem> items;
-	
+
 	@ManyToOne
 	@JoinColumn(name = "assigned_agent_id")
 	private DeliveryAgent assignedAgent;
-
 
 	public DeliveryAgent getAssignedAgent() {
 		return assignedAgent;
@@ -52,7 +52,7 @@ public class Order {
 	}
 
 	public Order() {
-		 this.history = new ArrayList<>();
+		this.history = new ArrayList<>();
 	}
 
 	public String getStatus() {
@@ -109,6 +109,14 @@ public class Order {
 
 	public void setTotal(Double total) {
 		this.total = total;
+	}
+
+	public String getPaymentMethod() {
+		return paymentMethod;
+	}
+
+	public void setPaymentMethod(String paymentMethod) {
+		this.paymentMethod = paymentMethod;
 	}
 
 	public List<CartItem> getItems() {
