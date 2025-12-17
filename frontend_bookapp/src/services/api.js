@@ -9,7 +9,7 @@ const api = axios.create({
 // REQUEST INTERCEPTOR (Attach correct token automatically)
 // -----------------------------------------------------------
 api.interceptors.request.use((config) => {
-  const deliveryToken = localStorage.getItem("deliveryToken");
+  const deliveryToken = localStorage.getItem("accessToken");
   const vendorToken = localStorage.getItem("vendorToken");
   const userToken = localStorage.getItem("accessToken");
 
@@ -73,7 +73,7 @@ api.interceptors.response.use(
         localStorage.removeItem("vendorToken");
         localStorage.removeItem("vendorName");
 
-        window.location.replace("/vendors/login");
+        window.location.replace("/login");
         return Promise.reject(error);
       }
 

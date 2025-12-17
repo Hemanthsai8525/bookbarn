@@ -103,7 +103,7 @@ export default function UnifiedLogin() {
                     email: form.input,
                     password: form.password
                 });
-                localStorage.setItem("deliveryToken", res.data.token);
+                localStorage.setItem("deliveryToken", res.data.accessToken);
                 localStorage.setItem("deliveryAgent", JSON.stringify(res.data.agent));
                 nav("/delivery/dashboard");
             }
