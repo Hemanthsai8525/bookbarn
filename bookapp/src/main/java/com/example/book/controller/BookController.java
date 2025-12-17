@@ -34,21 +34,17 @@ public class BookController {
         this.vendorService = vendorService;
     }
 
-    // ================= GET ALL BOOKS =================
     @GetMapping
     public List<Book> all() {
         return svc.findAll();
     }
 
-    // ================= GET ONE BOOK ==================
     @GetMapping("/{id}")
     public ResponseEntity<Book> get(@PathVariable Long id) {
         return svc.findById(id).map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // ================= CREATE BOOK ====================
-    // ================= CREATE BOOK ====================
     @PostMapping
     public ResponseEntity<?> create(@RequestBody Book book, jakarta.servlet.http.HttpServletRequest request) {
         try {
@@ -71,7 +67,6 @@ public class BookController {
         }
     }
 
-    // ================= UPDATE BOOK ====================
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id, @RequestBody Book book,
             jakarta.servlet.http.HttpServletRequest request) {
@@ -133,7 +128,6 @@ public class BookController {
                         "skippedBooks", skipped));
     }
 
-    // ================= DELETE BOOK ====================
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id, jakarta.servlet.http.HttpServletRequest request) {
         if (!canEdit(id, request)) {
@@ -168,7 +162,6 @@ public class BookController {
         return false;
     }
 
-    // ================= IMAGE UPLOAD ===================
     @PostMapping("/upload")
     public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file) {
 
@@ -188,7 +181,7 @@ public class BookController {
 
             Files.write(path, file.getBytes());
 
-            String fileUrl = "/uploads/" + filename; // This URL will be saved in the book object
+            String fileUrl = "/uploads/" + filename;
 
             return ResponseEntity.ok(fileUrl);
 
