@@ -217,7 +217,7 @@ export default function Navbar() {
                                   <Package size={16} /> My Orders
                                 </Link>
                               )}
-                              <Link to={isAdmin ? "/admin" : "/profile"} className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-800 transition-colors">
+                              <Link to={isAdmin ? "/profile" : "/profile"} className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-800 transition-colors">
                                 <User size={16} /> Profile
                               </Link>
                               <button onClick={handleLogout} className="w-full text-left flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
