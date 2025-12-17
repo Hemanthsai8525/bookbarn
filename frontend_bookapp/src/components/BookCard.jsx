@@ -5,7 +5,9 @@ import { ShoppingCart } from "lucide-react";
 
 export default function BookCard({ book, onAdd }) {
   const user = JSON.parse(localStorage.getItem("user") || "null");
+  const delivery = JSON.parse(localStorage.getItem("deliveryAgent") || "null");
   const isAdmin = user?.role?.toLowerCase() === "admin";
+  const isDelivery = !!delivery;
   const isOutOfStock = book.stock === 0;
   const isLowStock = book.stock > 0 && book.stock < 5;
 
@@ -70,7 +72,7 @@ export default function BookCard({ book, onAdd }) {
             <span className="text-xl font-bold text-amber-700">₹{book.price}</span>
           </div>
 
-          {!isAdmin && (
+          {!isAdmin && !isDelivery && (
             <button
               onClick={() => !isOutOfStock && onAdd && onAdd(book.id)}
               disabled={isOutOfStock}

@@ -56,7 +56,7 @@ export default function DeliveryOrderDetails() {
   }
   function canMarkDelivered() {
     const s = (order?.status || "").toUpperCase();
-    return s === "OUT_FOR_DELIVERY" || s === "SHIPPED";
+    return s === "OUT_FOR_DELIVERY";
   }
 
   async function updateStatus(newStatus) {
@@ -108,7 +108,7 @@ export default function DeliveryOrderDetails() {
               <h2 className="text-2xl font-bold">Order #{order.id}</h2>
               <div className="text-sm text-gray-500 mt-1">Placed by <span className="font-semibold">{order.userName || order.userId}</span></div>
               <div className="mt-2 text-sm text-gray-700">Address: {order.address}</div>
-              <div className="text-sm text-gray-700">Phone: {order.phone}</div>
+              <div className="text-sm text-gray-700">Phone: <a href={`tel:${order.phone}`} className="text-blue-600 hover:underline font-medium">{order.phone}</a></div>
             </div>
             <div className="text-right">
               <div className="text-sm text-gray-500">Total</div>

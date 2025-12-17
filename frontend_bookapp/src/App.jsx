@@ -32,6 +32,7 @@ import DeliveryRegister from "./pages/DeliveryRegister";
 import DeliveryDashboard from "./pages/DeliveryDashboard";
 import DeliveryLogin from "./pages/DeliveryLogin";
 import DeliveryOrderDetails from "./pages/DeliveryOrderDetails";
+import DeliveryHistory from "./pages/DeliveryHistory";
 import DeliveryProfile from "./pages/DeliveryProfile";
 import DeliveryProfileEdit from "./pages/DeliveryProfileEdit";
 import VendorRegister from "./pages/VendorRegister";
@@ -189,6 +190,7 @@ export default function App() {
           <Route path="/delivery/update-profile" element={<DeliveryRoute><DeliveryProfileEdit /></DeliveryRoute>} />
 
           <Route path="/delivery/order/:orderId" element={<DeliveryRoute><DeliveryOrderDetails /></DeliveryRoute>} />
+          <Route path="/delivery/history" element={<DeliveryRoute><DeliveryHistory /></DeliveryRoute>} />
 
 
           {/* VENDOR ROUTES */}

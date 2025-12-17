@@ -54,6 +54,13 @@ export default function Books() {
 
   async function addToCart(bookId) {
     const user = JSON.parse(localStorage.getItem("user") || "null");
+    const delivery = JSON.parse(localStorage.getItem("deliveryAgent") || "null");
+
+    if (delivery) {
+      alert("Delivery agents cannot place orders.");
+      return;
+    }
+
     if (!user) {
       window.location = "/login";
       return;

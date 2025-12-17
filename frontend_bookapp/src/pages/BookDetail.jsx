@@ -10,7 +10,9 @@ export default function BookDetail() {
   const [book, setBook] = useState(null);
 
   const user = JSON.parse(localStorage.getItem("user") || "null");
+  const delivery = JSON.parse(localStorage.getItem("deliveryAgent") || "null");
   const isAdmin = user?.role?.toLowerCase() === "admin";
+  const isDelivery = !!delivery;
 
   useEffect(() => {
     api.get(`/books/${id}`)
@@ -30,14 +32,15 @@ export default function BookDetail() {
 
   async function addToCart() {
     if (isAdmin) { alert("Admin users cannot place orders."); return; }
+    if (isDelivery) { alert("Delivery agents cannot place orders."); return; }
     if (Number(book.stock) === 0) { alert("This book is out of stock."); return; }
     if (!user) { window.location = "/login"; return; }
 
     try {
       await api.post("/cart", { userId: user.id, bookId: book.id, quantity: 1 });
       const toast = document.createElement("div");
-      toast.className = "fixed bottom-5 right-5 bg-black text-white px-4 py-2 rounded-lg shadow-xl z-[999] animate-fade-in";
-      toast.innerText = "Added to Cart!";
+      toast.className = "fixed bottom-5 right-5 bg-emerald-600 text-white px-6 py-3 rounded-xl shadow-2xl z-[999] animate-fade-in flex items-center gap-2";
+      toast.innerHTML = `<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg> Added to Cart!`;
       document.body.appendChild(toast);
       setTimeout(() => toast.remove(), 2000);
     } catch (err) {
@@ -47,6 +50,7 @@ export default function BookDetail() {
 
   async function buyNow() {
     if (isAdmin) { alert("Admin users cannot place orders."); return; }
+    if (isDelivery) { alert("Delivery agents cannot place orders."); return; }
     if (Number(book.stock) === 0) { alert("This book is out of stock."); return; }
     if (!user) { window.location = "/login"; return; }
 
@@ -135,9 +139,9 @@ export default function BookDetail() {
 
               {/* Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 mt-auto">
-                {isAdmin ? (
+                {isAdmin || isDelivery ? (
                   <div className="w-full py-4 bg-gray-100 text-gray-400 font-bold text-center rounded-xl border border-dashed border-gray-300">
-                    Admin View Only
+                    {isAdmin ? "Admin View Only" : "Delivery Agent View Only"}
                   </div>
                 ) : book.stock > 0 ? (
                   <>
