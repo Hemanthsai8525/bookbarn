@@ -23,8 +23,7 @@ export default function Register() {
 
   // ================= PASSWORD VALIDATOR =================
   const isStrongPassword = (pwd) => {
-    const pattern =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    const pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
     return pattern.test(pwd);
   };
 
