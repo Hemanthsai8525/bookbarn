@@ -6,7 +6,7 @@ export default function DeliveryNavbar() {
 
   function handleLogout() {
     localStorage.clear();
-    navigate("/delivery/login");
+    navigate("/login");
   }
 
   return (
