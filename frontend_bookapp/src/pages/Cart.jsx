@@ -131,6 +131,7 @@ export default function Cart() {
                         src={book.image?.startsWith("http") ? book.image : `https://bookapp-production-3e11.up.railway.app${book.image}`}
                         alt={book.title}
                         className="w-full h-full object-cover"
+                        onError={(e) => { e.target.onerror = null; e.target.src = "https://via.placeholder.com/150x200?text=Book+Cover"; }}
                       />
                     </div>
                     <div className="flex-1 min-w-0">

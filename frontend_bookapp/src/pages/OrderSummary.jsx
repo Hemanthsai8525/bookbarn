@@ -80,6 +80,7 @@ export default function OrderSummary() {
                         src={details.image?.startsWith('http') ? details.image : `https://bookapp-production-3e11.up.railway.app${details.image}`}
                         className="w-16 h-20 object-cover rounded-md shadow-sm bg-gray-100"
                         alt=""
+                        onError={(e) => { e.target.onerror = null; e.target.src = "https://via.placeholder.com/150x200?text=N/A"; }}
                       />
                       <div className="flex-1">
                         <h4 className="font-bold text-gray-900">{details.title}</h4>
