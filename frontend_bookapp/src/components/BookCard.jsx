@@ -29,6 +29,10 @@ export default function BookCard({ book, onAdd }) {
           className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 ${isOutOfStock ? "grayscale opacity-60" : ""
             }`}
           loading="lazy"
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = "https://via.placeholder.com/300x450?text=No+Cover";
+          }}
         />
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

@@ -95,6 +95,10 @@ export default function BookDetail() {
                 src={book.image?.startsWith("http") ? book.image : `https://bookapp-production-3e11.up.railway.app${book.image}`}
                 alt={book.title}
                 className="relative w-3/5 shadow-2xl rounded-r-lg transform group-hover:scale-105 transition-transform duration-500"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = "https://via.placeholder.com/400x600?text=No+Cover";
+                }}
               />
             </div>
 
