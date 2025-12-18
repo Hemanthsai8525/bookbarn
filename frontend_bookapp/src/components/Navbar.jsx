@@ -1,7 +1,7 @@
 ﻿import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { getCurrentUser, logout } from "../services/auth";
-import { ShoppingCart, BookOpen, Menu, X, Truck, User, LogOut, LayoutDashboard, Package } from "lucide-react";
+import { ShoppingCart, BookOpen, Menu, X, Truck, User, LogOut, LayoutDashboard, Package, Bell } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "../services/api";
 
@@ -78,11 +78,44 @@ export default function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // Close dropdown when clicking outside
+  // Notification State
+  const [notifications, setNotifications] = useState([]);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const notifRef = useRef(null);
+
+  // Poll for notifications if Vendor
+  useEffect(() => {
+    if (!isVendor) return;
+
+    const fetchNotifs = async () => {
+      try {
+        // If we don't have vendorId but have token, we might need to fetch profile first
+        // But for Navbar speed, we check localStorage or lazy load
+        // Ideally we cache vendorId in localStorage on login.
+        // Fallback: try to get profile
+        const response = await api.get("/vendor/profile");
+        const vId = response.data.id;
+
+        const notifRes = await api.get(`/notifications/vendor/${vId}`);
+        setNotifications(notifRes.data);
+      } catch (e) {
+        console.error("Navbar notification fetch failed", e);
+      }
+    };
+
+    fetchNotifs();
+    const interval = setInterval(fetchNotifs, 30000);
+    return () => clearInterval(interval);
+  }, [isVendor]);
+
+  // Close dropdowns when clicking outside
   useEffect(() => {
     function handler(e) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setDropdownOpen(false);
+      }
+      if (notifRef.current && !notifRef.current.contains(e.target)) {
+        setNotifOpen(false);
       }
     }
     document.addEventListener("mousedown", handler);
@@ -93,6 +126,7 @@ export default function Navbar() {
   useEffect(() => {
     setMenuOpen(false);
     setDropdownOpen(false);
+    setNotifOpen(false);
   }, [location.pathname]);
 
   const deliveryLogout = () => {
@@ -188,6 +222,50 @@ export default function Navbar() {
                       </motion.span>
                     )}
                   </Link>
+                )}
+
+                {/* Vendor Notifications */}
+                {isVendor && (
+                  <div className="relative" ref={notifRef}>
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setNotifOpen(!notifOpen)}
+                      className="relative p-2 rounded-full hover:bg-amber-50 transition-colors"
+                    >
+                      <Bell size={22} className="text-gray-700 hover:text-amber-700" />
+                      {notifications.some(n => !n.isRead) && (
+                        <span className="absolute top-1 right-1 w-3 h-3 bg-red-500 border-2 border-white rounded-full"></span>
+                      )}
+                    </motion.button>
+
+                    <AnimatePresence>
+                      {notifOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                          className="absolute right-0 mt-4 w-80 glass-panel overflow-hidden py-2 z-50 origin-top-right ring-1 ring-black/5 bg-white shadow-xl rounded-2xl"
+                        >
+                          <div className="px-4 py-2 border-b border-gray-100 flex justify-between items-center">
+                            <h4 className="font-bold text-gray-900">Notifications</h4>
+                            <span className="text-xs text-gray-500">{notifications.length} New</span>
+                          </div>
+                          <div className="max-h-[300px] overflow-y-auto">
+                            {notifications.length === 0 ? (
+                              <div className="p-4 text-center text-gray-400 text-sm">No notifications</div>
+                            ) : (
+                              notifications.map((n, i) => (
+                                <div key={i} className="px-4 py-3 hover:bg-gray-50 border-b border-gray-50 last:border-0 transition-colors">
+                                  <p className="text-sm text-gray-800 line-clamp-2">{n.message}</p>
+                                  <p className="text-xs text-gray-400 mt-1">{new Date(n.timestamp).toLocaleString()}</p>
+                                </div>
+                              ))
+                            )}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                 )}
 
                 {/* Profile Auth */}

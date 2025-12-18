@@ -14,8 +14,9 @@ import { ArrowLeft, Download, Printer, MapPin, Phone, User, Package, Clock, Chec
 function statusColor(status) {
   switch ((status || "").toUpperCase()) {
     case "DELIVERED": return "bg-green-100 text-green-700 border-green-200";
-    case "SHIPPED": return "bg-blue-100 text-blue-700 border-blue-200";
+    case "SHIPPED": return "bg-purple-100 text-purple-700 border-purple-200";
     case "OUT_FOR_DELIVERY": return "bg-orange-100 text-orange-700 border-orange-200";
+    case "READY_FOR_DELIVERY": return "bg-blue-100 text-blue-700 border-blue-200";
     case "CONFIRMED": return "bg-indigo-100 text-indigo-700 border-indigo-200";
     case "CANCELLED": return "bg-red-100 text-red-700 border-red-200";
     default: return "bg-amber-50 text-amber-700 border-amber-200";
@@ -34,9 +35,10 @@ function statusIcon(status) {
 function statusProgressValue(status) {
   switch ((status || "").toUpperCase()) {
     case "PENDING": return 10;
-    case "CONFIRMED": return 35;
-    case "SHIPPED": return 60;
-    case "OUT_FOR_DELIVERY": return 85;
+    case "CONFIRMED": return 30;
+    case "READY_FOR_DELIVERY": return 50;
+    case "SHIPPED": return 75;
+    case "OUT_FOR_DELIVERY": return 90;
     case "DELIVERED": return 100;
     case "CANCELLED": return 100;
     default: return 5;
@@ -233,6 +235,31 @@ export default function OrderDetails() {
                   <Phone size={16} /> {order.phone}
                 </div>
               </div>
+
+              {/* Delivery Agent info */}
+              {order.assignedAgent && (
+                <div className="bg-white rounded-2xl shadow-sm border border-amber-100 p-6 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-amber-50 rounded-full -mr-12 -mt-12 transition-transform group-hover:scale-110" />
+                  <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2 relative z-10">
+                    <Truck size={20} className="text-amber-600" /> Delivery Hero
+                  </h3>
+                  <div className="flex items-center gap-4 relative z-10">
+                    <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-amber-700">
+                      <User size={24} />
+                    </div>
+                    <div>
+                      <p className="font-bold text-gray-900">{order.assignedAgent.name}</p>
+                      <p className="text-sm text-gray-500">Your delivery partner</p>
+                    </div>
+                  </div>
+                  <div className="mt-4 pt-4 border-t border-gray-50 flex justify-between items-center relative z-10 text-sm">
+                    <span className="text-gray-500">Contact Number</span>
+                    <a href={`tel:${order.assignedAgent.phone}`} className="font-bold text-amber-700 hover:underline">
+                      {order.assignedAgent.phone || "Not provided"}
+                    </a>
+                  </div>
+                </div>
+              )}
 
               {/* Timeline Feed */}
               {timeline.length > 0 && (

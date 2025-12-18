@@ -59,6 +59,26 @@ public class OrderController {
         return svc.getOrder(orderId);
     }
 
+    @GetMapping("/vendor/{vendorId}")
+    public List<Order> getVendorOrders(@PathVariable Long vendorId) {
+        return svc.findByVendorId(vendorId);
+    }
+
+    @GetMapping("/delivery/available")
+    public List<Order> getAvailableDeliveryOrders() {
+        return svc.findAvailableDeliveryOrders();
+    }
+
+    @GetMapping("/delivery/agent/{agentId}")
+    public List<Order> getAgentOrders(@PathVariable Long agentId) {
+        return svc.findByAgentId(agentId);
+    }
+
+    @PostMapping("/assign-agent")
+    public Order assignAgent(@RequestParam Long orderId, @RequestParam Long agentId) {
+        return svc.assignDeliveryAgent(orderId, agentId);
+    }
+
     @PostMapping("/update-status")
     public String update(@RequestParam Long id, @RequestParam String status) {
         svc.updateStatus(id, status); // ✔️ FIXED

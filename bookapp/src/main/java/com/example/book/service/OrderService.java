@@ -21,17 +21,19 @@ public class OrderService {
 	private final BookRepository bookRepo;
 	private final OrderHistoryRepository historyRepo;
 	private final BookService bookService;
-	private final com.example.book.repository.NotificationRepository notificationRepo;
+	private final com.example.book.repository.DeliveryAgentRepository deliveryRepo;
 
 	public OrderService(OrderRepository repo, CartRepository cartRepo, BookRepository bookRepo,
 			OrderHistoryRepository historyRepo, BookService bookService,
-			com.example.book.repository.NotificationRepository notificationRepo) {
+			com.example.book.repository.NotificationRepository notificationRepo,
+			com.example.book.repository.DeliveryAgentRepository deliveryRepo) {
 		this.repo = repo;
 		this.cartRepo = cartRepo;
 		this.bookRepo = bookRepo;
 		this.historyRepo = historyRepo;
 		this.bookService = bookService;
 		this.notificationRepo = notificationRepo;
+		this.deliveryRepo = deliveryRepo;
 	}
 
 	// ------------------ PLACE ORDER ------------------
@@ -104,6 +106,8 @@ public class OrderService {
 
 		order.getHistory().add(history);
 
+		// If status is SHIPPED, notify User? (Optional future enhancement)
+
 		return repo.save(order);
 	}
 
@@ -111,11 +115,12 @@ public class OrderService {
 		Order order = repo.findById(orderId)
 				.orElseThrow(() -> new RuntimeException("Order not found"));
 
-		order.setStatus("CONFIRMED");
+		// VENDOR ACCEPTS -> READY_FOR_DELIVERY
+		order.setStatus("READY_FOR_DELIVERY");
 
 		// Add history entry
 		OrderHistory h = new OrderHistory();
-		h.setStatus("CONFIRMED");
+		h.setStatus("READY_FOR_DELIVERY");
 		h.setOrder(order);
 
 		historyRepo.save(h);
@@ -142,6 +147,36 @@ public class OrderService {
 	// ------------------ ADMIN: ALL ORDERS ------------------
 	public List<Order> findAll() {
 		return repo.findAll().stream().map(this::enrichOrder).toList();
+	}
+
+	// ------------------ VENDOR ORDERS ------------------
+	public List<Order> findByVendorId(Long vendorId) {
+		return repo.findByVendorId(vendorId).stream().map(this::enrichOrder).toList();
+	}
+
+	// ------------------ DELIVERY: AVAILABLE ------------------
+	public List<Order> findAvailableDeliveryOrders() {
+		return repo.findByStatusAndAssignedAgentIsNull("READY_FOR_DELIVERY").stream().map(this::enrichOrder).toList();
+	}
+
+	// ------------------ DELIVERY: ASSIGN ------------------
+	public Order assignDeliveryAgent(Long orderId, Long agentId) {
+		Order order = repo.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+		com.example.book.model.DeliveryAgent agent = deliveryRepo.findById(agentId)
+				.orElseThrow(() -> new RuntimeException("Agent not found"));
+
+		order.setAssignedAgent(agent);
+		order.setStatus("SHIPPED"); // Or ASSIGNED. Let's use SHIPPED for simplicity as implied "Taken to delivery"
+
+		OrderHistory h = new OrderHistory("SHIPPED", order);
+		historyRepo.save(h);
+		order.getHistory().add(h);
+
+		return repo.save(order);
+	}
+
+	public List<Order> findByAgentId(Long agentId) {
+		return repo.findByAssignedAgentId(agentId).stream().map(this::enrichOrder).toList();
 	}
 
 	// ------------------ GET ORDER ------------------

@@ -1,7 +1,7 @@
 ﻿import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { BookOpen, LogOut, Package, Plus, Search, DollarSign, Image as ImageIcon, X, TrendingUp, Edit2, Trash2 } from "lucide-react";
+import { BookOpen, LogOut, Package, Plus, Search, DollarSign, Image as ImageIcon, X, TrendingUp, Edit2, Trash2, ShoppingBag, CheckCircle, RefreshCw } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function VendorDashboard() {
@@ -20,6 +20,8 @@ export default function VendorDashboard() {
     const token = localStorage.getItem("vendorToken");
 
     const [notifications, setNotifications] = useState([]);
+    const [orders, setOrders] = useState([]);
+    const [activeTab, setActiveTab] = useState("inventory"); // inventory | orders
 
     // Poll for notifications
     useEffect(() => {
@@ -39,6 +41,18 @@ export default function VendorDashboard() {
             return;
         }
         fetchMyBooks();
+        fetchNotifications();
+        fetchOrders(); // Initial fetch
+    }, [token]);
+
+    // Poll orders every 30s as well
+    useEffect(() => {
+        if (!token) return;
+        const interval = setInterval(() => {
+            fetchNotifications();
+            fetchOrders();
+        }, 30000);
+        return () => clearInterval(interval);
     }, [token]);
 
     const fetchNotifications = async () => {
@@ -58,6 +72,36 @@ export default function VendorDashboard() {
             console.error("Failed to fetch notifications", err);
         }
     }
+
+    const fetchOrders = async () => {
+        try {
+            const profileRes = await axios.get("https://bookapp-production-3e11.up.railway.app/vendor/profile", {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const vId = profileRes.data.id;
+
+            const res = await axios.get(`https://bookapp-production-3e11.up.railway.app/orders/vendor/${vId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setOrders(res.data);
+        } catch (err) {
+            console.error("Failed to fetch orders", err);
+        }
+    }
+
+    const handleAcceptOrder = async (orderId) => {
+        try {
+            await axios.post(`https://bookapp-production-3e11.up.railway.app/orders/update-status?id=${orderId}&status=READY_FOR_DELIVERY`, {}, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // Update local state immediately
+            setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: 'READY_FOR_DELIVERY' } : o));
+            setMessage("Order accepted and marked ready for delivery!");
+            setTimeout(() => setMessage(""), 3000);
+        } catch (err) {
+            setMessage("Failed to update status.");
+        }
+    };
 
     const fetchMyBooks = async () => {
         setLoading(true);
@@ -225,104 +269,192 @@ export default function VendorDashboard() {
                     </div>
                 </div>
 
-                {/* Actions & Search */}
-                <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
-                    <div className="relative w-full md:w-96">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                        <input
-                            type="text"
-                            placeholder="Search your inventory..."
-                            className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all font-medium"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                    </div>
+                {/* Tab Switcher */}
+                <div className="flex items-center gap-8 border-b border-gray-200 mb-8">
                     <button
-                        onClick={openAddModal}
-                        className="btn-primary flex items-center gap-2 px-6 py-3 shadow-lg shadow-amber-500/20"
+                        onClick={() => setActiveTab('inventory')}
+                        className={`pb-4 px-2 font-bold text-sm transition-all relative ${activeTab === 'inventory' ? 'text-amber-600' : 'text-gray-500 hover:text-gray-700'}`}
                     >
-                        <Plus size={20} /> Add New Book
+                        Inventory
+                        {activeTab === 'inventory' && <motion.div layoutId="tab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-600" />}
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('orders')}
+                        className={`pb-4 px-2 font-bold text-sm transition-all relative ${activeTab === 'orders' ? 'text-amber-600' : 'text-gray-500 hover:text-gray-700'}`}
+                    >
+                        Orders {orders.filter(o => o.status === 'PENDING').length > 0 && (
+                            <span className="ml-2 bg-red-500 text-white px-2 py-0.5 rounded-full text-[10px] animate-pulse">
+                                {orders.filter(o => o.status === 'PENDING').length}
+                            </span>
+                        )}
+                        {activeTab === 'orders' && <motion.div layoutId="tab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-600" />}
                     </button>
                 </div>
 
-                <AnimatePresence>
-                    {message && (
-                        <motion.div
-                            initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                            className="bg-emerald-50 text-emerald-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-2 border border-emerald-100 font-bold"
-                        >
-                            {message}
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-
-                {/* Books Grid */}
-                {loading ? (
-                    <div className="flex justify-center py-20">
-                        <div className="animate-spin rounded-full h-12 w-12 border-4 border-amber-600 border-t-transparent"></div>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {filteredBooks.map((b, i) => (
-                            <motion.div
-                                layout
-                                initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.05 }}
-                                key={b.id}
-                                className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all group relative"
+                {activeTab === 'inventory' ? (
+                    <>
+                        {/* Actions & Search */}
+                        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
+                            <div className="relative w-full md:w-96">
+                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                <input
+                                    type="text"
+                                    placeholder="Search your inventory..."
+                                    className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all font-medium"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                            </div>
+                            <button
+                                onClick={openAddModal}
+                                className="btn-primary flex items-center gap-2 px-6 py-3 shadow-lg shadow-amber-500/20"
                             >
-                                <div className="absolute top-3 right-3 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button
-                                        onClick={() => openEditModal(b)}
-                                        className="p-2 bg-white/90 backdrop-blur rounded-lg text-gray-600 hover:text-amber-600 shadow-sm"
-                                    >
-                                        <Edit2 size={16} />
-                                    </button>
-                                    <button
-                                        onClick={() => handleDelete(b.id)}
-                                        className="p-2 bg-white/90 backdrop-blur rounded-lg text-gray-600 hover:text-red-600 shadow-sm"
-                                    >
-                                        <Trash2 size={16} />
-                                    </button>
-                                </div>
+                                <Plus size={20} /> Add New Book
+                            </button>
+                        </div>
 
-                                <div className="h-48 bg-gray-100 relative overflow-hidden">
-                                    {b.image ? (
-                                        <img
-                                            src={
-                                                !b.image || (!b.image.startsWith('http') && !b.image.startsWith('/'))
-                                                    ? "https://via.placeholder.com/300x450?text=No+Cover"
-                                                    : b.image.startsWith('http')
-                                                        ? b.image
-                                                        : `https://bookapp-production-3e11.up.railway.app${b.image}`
-                                            }
-                                            alt={b.title}
-                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                            onError={(e) => { e.target.onerror = null; e.target.src = "https://via.placeholder.com/300x450?text=No+Cover"; }}
-                                        />
-                                    ) : (
-                                        <div className="flex items-center justify-center h-full text-gray-400">
-                                            <ImageIcon size={32} />
-                                        </div>
-                                    )}
-                                    <div className="absolute top-3 left-3">
-                                        <span className="bg-white/90 backdrop-blur text-xs font-bold px-2 py-1 rounded-md shadow-sm">
-                                            {b.category || "Uncategorized"}
-                                        </span>
-                                    </div>
-                                </div>
-                                <div className="p-5">
-                                    <h4 className="font-bold text-gray-900 mb-1 line-clamp-1">{b.title}</h4>
-                                    <p className="text-sm text-gray-500 mb-4">{b.author}</p>
+                        <AnimatePresence>
+                            {message && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                                    className="bg-emerald-50 text-emerald-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-2 border border-emerald-100 font-bold"
+                                >
+                                    <CheckCircle size={18} /> {message}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
 
-                                    <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-50">
-                                        <span className="font-bold text-lg text-gray-900">₹{b.price}</span>
-                                        <div className={`flex items-center gap-1.5 text-xs font-bold px-2 py-1 rounded-lg ${b.stock < 5 ? "bg-red-50 text-red-600" : "bg-emerald-50 text-emerald-700"}`}>
-                                            <Package size={14} /> {b.stock} Left
+                        {/* Books Grid */}
+                        {loading ? (
+                            <div className="flex justify-center py-20">
+                                <div className="animate-spin rounded-full h-12 w-12 border-4 border-amber-600 border-t-transparent"></div>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                                {filteredBooks.map((b, i) => (
+                                    <motion.div
+                                        layout
+                                        initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.05 }}
+                                        key={b.id}
+                                        className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all group relative"
+                                    >
+                                        <div className="absolute top-3 right-3 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button
+                                                onClick={() => openEditModal(b)}
+                                                className="p-2 bg-white/90 backdrop-blur rounded-lg text-gray-600 hover:text-amber-600 shadow-sm"
+                                            >
+                                                <Edit2 size={16} />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(b.id)}
+                                                className="p-2 bg-white/90 backdrop-blur rounded-lg text-gray-600 hover:text-red-600 shadow-sm"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
+
+                                        <div className="h-48 bg-gray-100 relative overflow-hidden">
+                                            {b.image ? (
+                                                <img
+                                                    src={
+                                                        !b.image || (!b.image.startsWith('http') && !b.image.startsWith('/'))
+                                                            ? "https://via.placeholder.com/300x450?text=No+Cover"
+                                                            : b.image.startsWith('http')
+                                                                ? b.image
+                                                                : `https://bookapp-production-3e11.up.railway.app${b.image}`
+                                                    }
+                                                    alt={b.title}
+                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                                    onError={(e) => { e.target.onerror = null; e.target.src = "https://via.placeholder.com/300x450?text=No+Cover"; }}
+                                                />
+                                            ) : (
+                                                <div className="flex items-center justify-center h-full text-gray-400">
+                                                    <ImageIcon size={32} />
+                                                </div>
+                                            )}
+                                            <div className="absolute top-3 left-3">
+                                                <span className="bg-white/90 backdrop-blur text-xs font-bold px-2 py-1 rounded-md shadow-sm">
+                                                    {b.category || "Uncategorized"}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="p-5">
+                                            <h4 className="font-bold text-gray-900 mb-1 line-clamp-1">{b.title}</h4>
+                                            <p className="text-sm text-gray-500 mb-4">{b.author}</p>
+
+                                            <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-50">
+                                                <span className="font-bold text-lg text-gray-900">₹{b.price}</span>
+                                                <div className={`flex items-center gap-1.5 text-xs font-bold px-2 py-1 rounded-lg ${b.stock < 5 ? "bg-red-50 text-red-600" : "bg-emerald-50 text-emerald-700"}`}>
+                                                    <Package size={14} /> {b.stock} Left
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </div>
+                        )}
+                    </>
+                ) : (
+                    <div className="space-y-4">
+                        {orders.length === 0 ? (
+                            <div className="bg-white rounded-2xl p-20 text-center border border-dashed border-gray-200">
+                                <ShoppingBag className="mx-auto text-gray-300 mb-4" size={48} />
+                                <h3 className="text-lg font-bold text-gray-900">No Orders Found</h3>
+                                <p className="text-gray-500">When customers buy your books, they will appear here.</p>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 gap-4">
+                                {orders.map(o => (
+                                    <div key={o.id} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:border-amber-200 transition-all">
+                                        <div className="flex flex-col md:flex-row justify-between gap-6">
+                                            <div className="space-y-2">
+                                                <div className="flex items-center gap-3">
+                                                    <span className="text-lg font-bold text-gray-900">Order #{o.id}</span>
+                                                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${o.status === 'PENDING' ? 'bg-amber-100 text-amber-700' :
+                                                            o.status === 'READY_FOR_DELIVERY' ? 'bg-blue-100 text-blue-700' :
+                                                                o.status === 'SHIPPED' ? 'bg-purple-100 text-purple-700' :
+                                                                    'bg-green-100 text-green-700'
+                                                        }`}>
+                                                        {o.status.replace(/_/g, " ")}
+                                                    </span>
+                                                </div>
+                                                <p className="text-sm text-gray-600 font-medium">Customer: {o.address} • {o.phone}</p>
+                                                <div className="flex flex-wrap gap-2 mt-2">
+                                                    {o.items.map((item, idx) => (
+                                                        <span key={idx} className="text-xs bg-gray-50 text-gray-600 px-2 py-1 rounded border border-gray-100">
+                                                            {item.book?.title} (x{item.quantity})
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            <div className="flex flex-col justify-center items-end gap-3">
+                                                <p className="text-xl font-bold text-gray-900">₹{o.total}</p>
+                                                {o.status === 'PENDING' && (
+                                                    <button
+                                                        onClick={() => handleAcceptOrder(o.id)}
+                                                        className="w-full md:w-auto bg-amber-600 hover:bg-amber-700 text-white px-6 py-2 rounded-xl font-bold text-sm shadow-lg shadow-amber-600/20 transition-all flex items-center justify-center gap-2"
+                                                    >
+                                                        <CheckCircle size={16} /> Accept & Pack
+                                                    </button>
+                                                )}
+                                                {o.status === 'READY_FOR_DELIVERY' && (
+                                                    <div className="flex items-center gap-2 text-blue-600 bg-blue-50 px-4 py-2 rounded-xl text-sm font-bold border border-blue-100">
+                                                        <RefreshCw size={16} className="animate-spin-slow" /> Awaiting Pickup
+                                                    </div>
+                                                )}
+                                                {o.assignedAgent && (
+                                                    <div className="text-right">
+                                                        <p className="text-[10px] text-gray-400 uppercase font-black">Delivery Hero</p>
+                                                        <p className="text-sm font-bold text-gray-800">{o.assignedAgent.name}</p>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </motion.div>
-                        ))}
+                                ))}
+                            </div>
+                        )}
                     </div>
                 )}
 

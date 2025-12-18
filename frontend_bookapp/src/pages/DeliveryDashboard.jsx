@@ -12,54 +12,26 @@ export default function DeliveryDashboard() {
 
   useEffect(() => {
     loadOrders();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const interval = setInterval(loadOrders, 30000); // Poll for new orders
+    return () => clearInterval(interval);
   }, []);
 
   async function loadOrders() {
     if (!agent?.id) {
-      setAssigned([]);
-      setAvailable([]);
       setLoading(false);
       return;
     }
 
-    setLoading(true);
     try {
-      // Check if token exists
-      const token = localStorage.getItem("deliveryToken");
-      if (!token) {
-        console.error("No delivery token found. Redirecting to login.");
-        navigate("/login");
-        return;
-      }
+      const [aRes, avRes] = await Promise.all([
+        api.get(`/orders/delivery/agent/${agent.id}`),
+        api.get("/orders/delivery/available")
+      ]);
 
-      console.log("Fetching assigned orders for agent:", agent.id);
-      // assigned to this agent
-      const aRes = await api.get(`/delivery/assigned/${agent.id}`);
-      const assignedData = Array.isArray(aRes.data) ? aRes.data : [];
-      console.log("Assigned orders received:", assignedData.length);
-
-      // keep only ASSIGNED and SHIPPED (as requested)
-      const assignedFiltered = assignedData.filter(o =>
-        ["ASSIGNED", "SHIPPED", "OUT_FOR_DELIVERY"].includes((o.status || "").toUpperCase())
-      );
-
-      // available: backend returns available, but ensure only CONFIRMED
-      const avRes = await api.get("/delivery/available");
-      const avData = Array.isArray(avRes.data) ? avRes.data : [];
-      const availableFiltered = avData.filter(o => (o.status || "").toUpperCase() === "CONFIRMED");
-
-      setAssigned(assignedFiltered);
-      setAvailable(availableFiltered);
+      setAssigned(aRes.data || []);
+      setAvailable(avRes.data || []);
     } catch (err) {
       console.error("Load orders failed:", err);
-      console.error("Error response:", err.response?.data);
-      console.error("Error status:", err.response?.status);
-
-      // If it's an auth error, the interceptor will handle redirect
-      // Otherwise, just show empty state
-      setAssigned([]);
-      setAvailable([]);
     } finally {
       setLoading(false);
     }
@@ -68,11 +40,11 @@ export default function DeliveryDashboard() {
   async function takeOrder(orderId) {
     if (!agent?.id) return alert("Agent info missing");
     try {
-      await api.post("/delivery/assign", { agentId: agent.id, orderId });
+      await api.post(`/orders/assign-agent?orderId=${orderId}&agentId=${agent.id}`);
       await loadOrders();
     } catch (err) {
       console.error("Failed to take order:", err);
-      alert(err?.response?.data?.error || "Could not accept order");
+      alert(err?.response?.data || "Could not accept order");
     }
   }
 
@@ -80,112 +52,109 @@ export default function DeliveryDashboard() {
     navigate(`/delivery/order/${id}`);
   }
 
-  const totalAssigned = assigned.length;
-  const totalAvailable = available.length;
-
-  if (loading) {
+  if (loading && assigned.length === 0 && available.length === 0) {
     return (
-      <div className="p-6">
-        <div className="max-w-3xl mx-auto bg-white p-6 rounded shadow">
-          <div className="animate-pulse h-6 bg-gray-200 rounded w-32 mb-4" />
-          <p className="text-gray-500">Loading delivery dashboard...</p>
-        </div>
+      <div className="flex justify-center items-center h-screen bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-amber-600 border-t-transparent"></div>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-5xl mx-auto space-y-8">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+      <div className="max-w-6xl mx-auto space-y-8">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800">Delivery Dashboard</h1>
-            <p className="text-gray-500 mt-1">Welcome back, <span className="font-semibold text-indigo-600">{agent?.name || "Agent"}</span></p>
+            <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Delivery Hub</h1>
+            <p className="text-gray-500 mt-1 flex items-center gap-2 font-medium">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              Welcome, <span className="text-gray-900">{agent?.name || "Agent"}</span>
+            </p>
           </div>
-          <div className="mt-4 md:mt-0 flex gap-3">
+          <div className="mt-6 md:mt-0 flex flex-wrap gap-3">
             <button
               onClick={() => navigate("/delivery/history")}
-              className="px-4 py-2 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-lg flex items-center gap-2 font-medium transition-colors shadow-sm"
+              className="px-6 py-3 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-2xl flex items-center gap-2 font-bold transition-all shadow-sm active:scale-95"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
               History
             </button>
-            <div className="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg flex items-center gap-2 font-medium">
-              <span className="w-2 h-2 rounded-full bg-indigo-600"></span>
-              {totalAssigned} Active
-            </div>
-            <div className="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-lg flex items-center gap-2 font-medium">
-              <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
-              {totalAvailable} Available
+            <div className="px-6 py-3 bg-amber-50 text-amber-700 rounded-2xl flex items-center gap-2 font-bold border border-amber-100">
+              {assigned.length} Active Tasks
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Assigned */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="p-2 bg-indigo-100 text-indigo-600 rounded-lg">
-                {/* icon */}
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
-              </div>
-              <h2 className="text-xl font-bold text-gray-800">My Deliveries</h2>
-            </div>
+          {/* My Deliveries Section */}
+          <section className="space-y-4">
+            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2 px-1">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+              My Active Deliveries
+            </h2>
 
             {assigned.length === 0 ? (
-              <div className="text-center py-12 bg-white rounded-xl border border-dashed border-gray-300">
-                <p className="text-gray-400">No active deliveries assigned.</p>
+              <div className="text-center py-16 bg-white rounded-3xl border border-dashed border-gray-200">
+                <p className="text-gray-400 font-medium italic">No active deliveries assigned.</p>
+                <p className="text-sm text-gray-400 mt-1">Pick an order from the available list!</p>
               </div>
             ) : assigned.map(o => (
-              <div key={o.id} onClick={() => openDetails(o.id)} className="group bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all cursor-pointer relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-1 h-full bg-indigo-500 group-hover:bg-indigo-600 transition-colors" />
-                <div className="flex justify-between items-center">
-                  <div>
-                    <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">Order #{o.id}</span>
-                    <h4 className="text-lg font-bold text-gray-800 mt-1">Assigned Ready for delivery</h4>
+              <div
+                key={o.id}
+                onClick={() => openDetails(o.id)}
+                className="group bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:border-amber-300 hover:shadow-xl transition-all cursor-pointer relative overflow-hidden active:scale-[0.98]"
+              >
+                <div className="absolute top-0 right-0 w-32 h-32 bg-amber-50/50 rounded-full -mr-16 -mt-16 group-hover:bg-amber-100 transition-colors" />
+                <div className="flex justify-between items-start relative z-10">
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-amber-600">Order #{o.id}</span>
+                    <h4 className="text-lg font-bold text-gray-900">{o.address}</h4>
                   </div>
-                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${o.status === 'DELIVERED' ? 'bg-green-100 text-green-700' : o.status === 'SHIPPED' ? 'bg-blue-100 text-blue-700' : 'bg-indigo-100 text-indigo-700'}`}>
+                  <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${o.status === 'DELIVERED' ? 'bg-emerald-100 text-emerald-700' :
+                    o.status === 'SHIPPED' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'
+                    }`}>
                     {o.status}
                   </span>
                 </div>
 
-                <div className="mt-4 flex items-center justify-between text-sm text-gray-500">
-                  <div>{o.items?.length || 0} items ₹ {o.total}</div>
-                  <div className="text-indigo-500">View details </div>
+                <div className="mt-6 flex items-center justify-between text-sm relative z-10">
+                  <div className="text-gray-500 font-medium">₹ {o.total} • <span className="text-gray-400 font-normal">{o.items?.length || 0} items</span></div>
+                  <div className="text-amber-600 font-bold flex items-center gap-1">
+                    Manage <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+                  </div>
                 </div>
               </div>
             ))}
-          </div>
+          </section>
 
-          {/* Available */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="p-2 bg-emerald-100 text-emerald-600 rounded-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
-              </div>
-              <h2 className="text-xl font-bold text-gray-800">New Opportunities</h2>
-            </div>
+          {/* New Opportunities Section */}
+          <section className="space-y-4">
+            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2 px-1">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+              Available for Pickup
+            </h2>
 
             {available.length === 0 ? (
-              <div className="text-center py-12 bg-white rounded-xl border border-dashed border-gray-300">
-                <p className="text-gray-400">No new orders available right now.</p>
+              <div className="text-center py-16 bg-white rounded-3xl border border-dashed border-gray-200">
+                <p className="text-gray-400 font-medium italic">Scanning for new orders...</p>
               </div>
             ) : available.map(o => (
-              <div key={o.id} className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center group hover:border-emerald-200 transition-all">
-                <div>
-                  <span className="text-xs font-semibold uppercase tracking-wider text-emerald-600">New Order</span>
-                  <h4 className="text-lg font-bold text-gray-800 mt-1">Order #{o.id}</h4>
-                  <p className="text-sm text-gray-500 mt-1">Waiting for pickup</p>
+              <div key={o.id} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:border-emerald-300 transition-all flex justify-between items-center group shadow-sm hover:shadow-lg">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">Payout: ₹{Math.floor(o.total * 0.05 + 50)}</span>
+                  <h4 className="text-lg font-bold text-gray-900">Order #{o.id}</h4>
+                  <p className="text-sm text-gray-500 font-medium">{o.address.split(',')[0]}...</p>
                 </div>
                 <button
-                  className="ml-3 px-3 py-2 bg-emerald-600 text-white rounded text-sm"
                   onClick={() => takeOrder(o.id)}
+                  className="px-6 py-3 bg-gray-900 hover:bg-emerald-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-lg active:scale-95"
                 >
-                  Accept
+                  Accept Delivery
                 </button>
               </div>
             ))}
-          </div>
+          </section>
         </div>
       </div>
     </div>

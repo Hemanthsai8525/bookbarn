@@ -34,7 +34,8 @@ export default function Orders() {
     switch ((status || "").toUpperCase()) {
       case "DELIVERED": return "bg-green-100 text-green-700 border-green-200";
       case "CANCELLED": return "bg-red-50 text-red-600 border-red-100";
-      case "SHIPPED": return "bg-blue-50 text-blue-700 border-blue-100";
+      case "SHIPPED": return "bg-purple-100 text-purple-700 border-purple-200";
+      case "READY_FOR_DELIVERY": return "bg-blue-100 text-blue-700 border-blue-200";
       default: return "bg-amber-50 text-amber-700 border-amber-100";
     }
   }
