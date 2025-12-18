@@ -21,7 +21,7 @@ export default function BookCard({ book, onAdd }) {
       <Link to={`/book/${book.id}`} className="relative block overflow-hidden aspect-[2/3]">
         <img
           src={
-            !book.image
+            !book.image || (!book.image.startsWith("http") && !book.image.startsWith("/"))
               ? "https://via.placeholder.com/300x450?text=No+Cover"
               : book.image.startsWith("http")
                 ? book.image

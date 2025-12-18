@@ -93,7 +93,7 @@ export default function BookDetail() {
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.5 }}
                 src={
-                  !book.image
+                  !book.image || (!book.image.startsWith("http") && !book.image.startsWith("/"))
                     ? "https://via.placeholder.com/400x600?text=No+Cover"
                     : book.image.startsWith("http")
                       ? book.image

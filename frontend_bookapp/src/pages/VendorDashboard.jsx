@@ -275,7 +275,16 @@ export default function VendorDashboard() {
 
                                 <div className="h-48 bg-gray-100 relative overflow-hidden">
                                     {b.image ? (
-                                        <img src={b.image.startsWith('http') ? b.image : `https://bookapp-production-3e11.up.railway.app${b.image}`} alt={b.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                        <img 
+                                            src={
+                                                !b.image || (!b.image.startsWith('http') && !b.image.startsWith('/'))
+                                                    ? "https://via.placeholder.com/300x450?text=No+Cover"
+                                                    : b.image.startsWith('http') 
+                                                        ? b.image 
+                                                        : `https://bookapp-production-3e11.up.railway.app${b.image}`
+                                            } 
+                                            alt={b.title} 
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                             onError={(e) => { e.target.onerror = null; e.target.src = "https://via.placeholder.com/300x450?text=No+Cover"; }}
                                         />
                                     ) : (
