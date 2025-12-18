@@ -1,260 +1,171 @@
-# BookBarn - Online Bookstore Platform
+# 📚 BookBarn - Online Bookstore Platform
 
-A full-stack online bookstore application with separate portals for Users, Vendors, and Delivery Agents. Features include book browsing, cart management, order processing, and secure OTP-based authentication.
+A comprehensive, full-stack online bookstore application featuring separate portals for **Users**, **Vendors**, **Delivery Agents**, and **Admins**. Built with modern technologies to ensure a premium user experience, secure authentication, and efficient order management.
 
-## 🚀 Features
+## 🚀 Live Demo
 
-### User Portal
-- Browse books by category, search, and filter
-- Shopping cart and wishlist
-- Secure checkout with order tracking
-- Profile management with OTP-secured password changes
-- Email OTP verification for registration and password reset
+- **Frontend:** [https://bookbarn.netlify.app](https://bookbarn.netlify.app) (Replace with your actual Netlify URL)
+- **Backend API:** [https://bookbarn-production.up.railway.app](https://bookbarn-production.up.railway.app) (Replace with your actual Railway URL)
 
-### Vendor Portal
-- Business registration with admin approval
-- Book inventory management (Add/Edit/Delete)
-- Order management and fulfillment
-- Sales analytics dashboard
-- OTP-secured profile and password management
+---
 
-### Delivery Agent Portal
-- Registration and area assignment
-- View assigned deliveries
-- Update delivery status
-- Earnings tracking
-- OTP-secured authentication
+## ✨ Key Features
 
-### Admin Portal
-- User, vendor, and delivery agent management
-- Vendor approval workflow
-- Order oversight
-- Platform analytics
-- Book catalog management
+### 👤 User Portal
+- **Browse & Search:** Advanced filtering by category, price, and author.
+- **Cart & Wishlist:** Seamless management of desired items.
+- **Secure Checkout:** Integrated payment flow (simulated) and order placement.
+- **Order Tracking:** Real-time status updates from processing to delivery.
+- **Profile Security:** OTP-based password changes and profile updates.
+
+### 🏪 Vendor Portal
+- **Inventory Management:** Add, edit, and remove books.
+- **Sales Analytics:** Visual dashboards for tracking performance.
+- **Order Processing:** Manage incoming orders and assign to delivery.
+- **Business Profile:** Customizable vendor details.
+
+### 🚚 Delivery Agent Portal
+- **Dashboard:** View assigned deliveries and earnings.
+- **Status Updates:** Real-time marking of orders as Picked Up or Delivered.
+- **History:** Track past deliveries and performance.
+
+### 🛡️ Admin Portal
+- **Platform Oversight:** Monitor all users, vendors, and agents.
+- **Approvals:** Review and approve/reject vendor and agent registrations.
+- **Analytics:** Global platform statistics and reporting.
+
+---
 
 ## 🛠️ Tech Stack
 
 ### Backend
-- **Java 17** with **Spring Boot 3.2.5**
-- **Spring Security** with JWT authentication
-- **Spring Data JPA** with Hibernate
-- **MySQL** database
-- **JavaMailSender** for OTP emails
-- **Maven** for dependency management
+- **Framework:** Java 17, Spring Boot 3.2.5
+- **Security:** Spring Security, JWT Authentication, BCrypt Hashing
+- **Database:** MySQL 8.0, Spring Data JPA, Hibernate
+- **Email Service:** **Brevo (Sendinblue)** REST API for reliable OTP delivery
+- **Build Tool:** Maven
 
 ### Frontend
-- **React 18** with **Vite**
-- **React Router** for navigation
-- **Axios** for API calls
-- **Tailwind CSS** for styling
-- **Framer Motion** for animations
-- **Lucide React** for icons
+- **Framework:** React 18, Vite
+- **Styling:** Tailwind CSS, Framer Motion (Animations)
+- **Icons:** Lucide React
+- **State/HTTP:** React Hooks, Axios
 
-## 📋 Prerequisites
-
-- **Java 17** or higher
-- **Node.js 16** or higher
-- **MySQL 8.0** or higher
-- **Maven 3.6** or higher
-- **Git**
-
-## 🔧 Installation & Setup
-
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/YOUR_USERNAME/bookbarn.git
-cd bookbarn
-```
-
-### 2. Database Setup
-
-Create MySQL database:
-
-```sql
-CREATE DATABASE bookstore;
-```
-
-The application will auto-create tables on first run.
-
-### 3. Backend Configuration
-
-Navigate to backend directory:
-
-```bash
-cd bookapp
-```
-
-Update `src/main/resources/application.properties`:
-
-```properties
-# Database Configuration
-spring.datasource.url=jdbc:mysql://localhost:3306/bookstore?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-spring.datasource.username=YOUR_DB_USERNAME
-spring.datasource.password=YOUR_DB_PASSWORD
-
-# Email Configuration (Gmail)
-spring.mail.username=your-email@gmail.com
-spring.mail.password=your-gmail-app-password
-```
-
-**Note:** For Gmail, you need to generate an App Password:
-1. Enable 2-Step Verification
-2. Go to: https://myaccount.google.com/apppasswords
-3. Generate password for "Mail"
-4. Use the 16-character password (remove spaces)
-
-Install dependencies and run:
-
-```bash
-mvn clean install
-mvn spring-boot:run
-```
-
-Backend will run on: `http://localhost:8080`
-
-### 4. Frontend Configuration
-
-Navigate to frontend directory:
-
-```bash
-cd ../frontend_bookapp
-```
-
-Install dependencies:
-
-```bash
-npm install
-```
-
-Run development server:
-
-```bash
-npm run dev
-```
-
-Frontend will run on: `http://localhost:5173`
-
-## 🌐 Deployment
-
-### Backend Deployment (Heroku/Railway/Render)
-
-1. **Create `Procfile`** in backend root:
-```
-web: java -jar target/book-0.0.1-SNAPSHOT.jar
-```
-
-2. **Update `application.properties`** for production:
-```properties
-spring.datasource.url=${DATABASE_URL}
-spring.mail.username=${EMAIL_USERNAME}
-spring.mail.password=${EMAIL_PASSWORD}
-app.jwt.secret=${JWT_SECRET}
-```
-
-3. **Deploy to platform** (example: Railway)
-```bash
-railway login
-railway init
-railway up
-```
-
-### Frontend Deployment (Vercel/Netlify)
-
-1. **Build production bundle:**
-```bash
-npm run build
-```
-
-2. **Update API URL** in `src/services/api.js`:
-```javascript
-const API_URL = import.meta.env.VITE_API_URL || 'https://your-backend-url.com';
-```
-
-3. **Deploy to Vercel:**
-```bash
-npm install -g vercel
-vercel --prod
-```
-
-## 📁 Project Structure
-
-```
-bookbarn/
-├── bookapp/                    # Spring Boot Backend
-│   ├── src/main/java/
-│   │   └── com/example/book/
-│   │       ├── config/         # Security, CORS
-│   │       ├── controller/     # REST Controllers
-│   │       ├── model/          # JPA Entities
-│   │       ├── repository/     # Data Access
-│   │       └── service/        # Business Logic
-│   └── src/main/resources/
-│       └── application.properties
-│
-└── frontend_bookapp/           # React Frontend
-    ├── src/
-    │   ├── components/         # Reusable Components
-    │   ├── pages/              # Page Components
-    │   ├── services/           # API Services
-    │   └── App.jsx
-    └── package.json
-```
-
-## 🔐 Security Features
-
-- **JWT Authentication** - Secure token-based auth
-- **Email OTP Verification** - For registration and password reset
-- **Password Encryption** - BCrypt hashing
-- **Role-Based Access Control** - USER, VENDOR, DELIVERY_AGENT, ADMIN
-- **CORS Protection** - Configured for specific origins
-- **Input Validation** - Server-side validation
-
-## 📧 Email OTP System
-
-- **Registration:** Email verification required
-- **Password Reset:** OTP-based password recovery
-- **Profile Updates:** OTP required for password changes
-- **10-minute expiry** for security
-- **Console fallback** for development/testing
-
-## 🎨 UI/UX Features
-
-- **Glassmorphism Design** - Modern, premium look
-- **Responsive Layout** - Mobile-first design
-- **Smooth Animations** - Framer Motion
-- **Toast Notifications** - User feedback
-- **Loading States** - Better UX
-- **Error Handling** - User-friendly messages
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Open Pull Request
-
-## 📝 License
-
-This project is licensed under the MIT License.
-
-## 👥 Authors
-
-- **Your Name** - Initial work
-
-## 🙏 Acknowledgments
-
-- Spring Boot Documentation
-- React Documentation
-- Tailwind CSS
-- Framer Motion
-- Lucide Icons
-
-## 📞 Support
-
-For support, email your-email@example.com or open an issue.
+### Deployment & DevOps
+- **Frontend Hosting:** Netlify
+- **Backend Hosting:** Railway
+- **Database:** Railway Managed MySQL
+- **Version Control:** Git
 
 ---
 
-**Made with ❤️ by [Your Name]**
+## 📁 Project Structure
+
+```bash
+bookbarn/
+├── bookapp/                    # Spring Boot Backend
+│   ├── src/main/resources/     # Config files (application.properties)
+│   └── src/main/java/          # Source code (Controllers, Services, Models)
+│
+├── frontend_bookapp/           # React Frontend
+│   ├── src/components/         # Reusable UI components
+│   ├── src/pages/              # Main route pages
+│   └── src/services/           # API services (api.js)
+│
+├── BREVO_README.md             # Email integration details
+└── NETLIFY_DEPLOYMENT.md       # Deployment guide
+```
+
+---
+
+## ⚡ Local Development Setup
+
+### Prerequisites
+- Java 17+
+- Node.js 18+
+- MySQL 8.0+
+- Maven
+
+### 1. Backend Setup (`bookapp`)
+
+1.  **Configure Database:**
+    Update `src/main/resources/application.properties` with your local MySQL credentials:
+    ```properties
+    spring.datasource.url=jdbc:mysql://localhost:3306/bookstore
+    spring.datasource.username=root
+    spring.datasource.password=your_password
+    ```
+
+2.  **Configure Email (Brevo):**
+    Set up your Brevo API credentials (see `BREVO_README.md` for details) in `application.properties` or environment variables:
+    ```properties
+    brevo.api.key=xkeysib-your-key
+    brevo.sender.email=your-verified-email@domain.com
+    ```
+
+3.  **Run the Backend:**
+    ```bash
+    cd bookapp
+    mvn spring-boot:run
+    ```
+    Server will start at `http://localhost:8080`.
+
+### 2. Frontend Setup (`frontend_bookapp`)
+
+1.  **Install Dependencies:**
+    ```bash
+    cd frontend_bookapp
+    npm install
+    ```
+
+2.  **Configure Environment:**
+    Create a `.env` file in the `frontend_bookapp` root (copy from `.env.example` if available):
+    ```env
+    VITE_API_URL=http://localhost:8080
+    ```
+
+3.  **Run the Frontend:**
+    ```bash
+    npm run dev
+    ```
+    App will launch at `http://localhost:5173`.
+
+---
+
+## 🚀 Deployment Guide
+
+Detailed deployment instructions are available in [NETLIFY_DEPLOYMENT.md](./NETLIFY_DEPLOYMENT.md).
+
+### Quick Summary:
+1.  **Backend (Railway):**
+    - Connect GitHub repo.
+    - Set Root Directory to `bookapp`.
+    - Add MySQL plugin.
+    - Set Environment Variables (`DATABASE_URL`, `BREVO_API_KEY`, etc.).
+
+2.  **Frontend (Netlify):**
+    - Connect GitHub repo.
+    - Set Base Directory to `frontend_bookapp`.
+    - Build Command: `npm run build`.
+    - Publish Directory: `dist`.
+    - Set `VITE_API_URL` to your Railway backend URL.
+
+---
+
+## 🔐 Security Features
+
+- **JWT Auth:** Stateless authentication for scalable security.
+- **RBAC:** Strict Role-Based Access Control ensuring users only access authorized resources.
+- **Secure OTPs:** Email-based OTPs for sensitive actions (Registration, Password Reset), hashed with BCrypt.
+- **CORS:** Configured to allow traffic only from trusted frontend domains.
+
+---
+
+## 📞 Support
+
+For issues specifically related to Email/OTP, check `BREVO_README.md`.
+For deployment troubleshooting, check `NETLIFY_DEPLOYMENT.md`.
+
+---
+
+**Made with ❤️ for the BookBarn Project**
