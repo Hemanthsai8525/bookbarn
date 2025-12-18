@@ -21,27 +21,30 @@ export default function VendorDashboard() {
 
     const [notifications, setNotifications] = useState([]);
 
+    // Poll for notifications
+    useEffect(() => {
+        if (!token) return;
+
+        // Initial fetch
+        fetchNotifications();
+
+        // Poll every 30 seconds
+        const interval = setInterval(fetchNotifications, 30000);
+        return () => clearInterval(interval);
+    }, [token]);
+
     useEffect(() => {
         if (!token) {
             navigate("/login");
             return;
         }
         fetchMyBooks();
-        fetchNotifications();
     }, [token]);
 
     const fetchNotifications = async () => {
         try {
-            // Need vendor ID first, usually stored or decoded from token. 
-            // For now, let's assume we can get it or we have an endpoint 'my-notifications'
-            // Since we don't have 'my-notifications' endpoint, we need to decode token or fetch profile first.
-            // Let's rely on stored "vendor" object if available, or fetch profile.
-
-            // Re-using profile endpoint or decoding token is best practice, 
-            // but for speed let's just use the profile endpoint if it exists or parse from localStorage if you stored it.
-            // Checking if vendorId is in localStorage
-
-            // Fallback: fetch profile to get ID
+            // Get vendor ID from profile (cached if possible, but for reliability we fetch)
+            // Note: In a real app we'd decode the JWT or store vendorId in localStorage on login
             const profileRes = await axios.get("https://bookapp-production-3e11.up.railway.app/vendor/profile", {
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -191,9 +194,18 @@ export default function VendorDashboard() {
 
                 {/* Notifications Section */}
                 <div className="mb-10">
-                    <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                        Recent Notifications
-                    </h3>
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                            Recent Notifications
+                        </h3>
+                        <button
+                            onClick={fetchNotifications}
+                            className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-full transition-all"
+                            title="Refresh Notifications"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /><path d="M8 16H3v5" /></svg>
+                        </button>
+                    </div>
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                         {notifications.length === 0 ? (
                             <div className="p-6 text-center text-gray-500">No new notifications</div>
@@ -275,15 +287,15 @@ export default function VendorDashboard() {
 
                                 <div className="h-48 bg-gray-100 relative overflow-hidden">
                                     {b.image ? (
-                                        <img 
+                                        <img
                                             src={
                                                 !b.image || (!b.image.startsWith('http') && !b.image.startsWith('/'))
                                                     ? "https://via.placeholder.com/300x450?text=No+Cover"
-                                                    : b.image.startsWith('http') 
-                                                        ? b.image 
+                                                    : b.image.startsWith('http')
+                                                        ? b.image
                                                         : `https://bookapp-production-3e11.up.railway.app${b.image}`
-                                            } 
-                                            alt={b.title} 
+                                            }
+                                            alt={b.title}
                                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                             onError={(e) => { e.target.onerror = null; e.target.src = "https://via.placeholder.com/300x450?text=No+Cover"; }}
                                         />
