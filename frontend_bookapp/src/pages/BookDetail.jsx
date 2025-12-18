@@ -38,6 +38,10 @@ export default function BookDetail() {
 
     try {
       await api.post("/cart", { userId: user.id, bookId: book.id, quantity: 1 });
+
+      // Notify navbar to update cart count
+      window.dispatchEvent(new Event('cartUpdated'));
+
       const toast = document.createElement("div");
       toast.className = "fixed bottom-5 right-5 bg-emerald-600 text-white px-6 py-3 rounded-xl shadow-2xl z-[999] animate-fade-in flex items-center gap-2";
       toast.innerHTML = `<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg> Added to Cart!`;

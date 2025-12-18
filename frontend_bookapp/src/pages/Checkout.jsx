@@ -22,7 +22,13 @@ export default function Checkout() {
     const tempOrder = {
       userId: user.id,
       address,
-      phone
+      phone,
+      items: state?.items || [],
+      subtotal: state?.subtotal || 0,
+      shipping: state?.shipping || 0,
+      tax: state?.tax || 0,
+      total: state?.total || 0,
+      buyNow: state?.buyNow || false
     };
 
     localStorage.setItem("order_temp", JSON.stringify(tempOrder));
@@ -100,13 +106,23 @@ export default function Checkout() {
                 <h3 className="text-lg font-bold text-gray-900 mb-4">Order Summary</h3>
                 <div className="space-y-3 pb-4 border-b border-gray-100">
                   <div className="flex justify-between text-gray-600">
-                    <span>Items Total</span>
-                    <span>₹{state?.total}</span>
+                    <span>Subtotal</span>
+                    <span>₹{state?.subtotal || state?.total}</span>
                   </div>
-                  <div className="flex justify-between text-green-600 text-sm">
+                  <div className="flex justify-between text-gray-600">
                     <span>Shipping</span>
-                    <span>Free</span>
+                    <span className={state?.shipping === 0 ? "text-green-600 font-medium" : ""}>
+                      {state?.shipping !== undefined
+                        ? (state.shipping === 0 ? "Free" : `₹${state.shipping}`)
+                        : "Free"}
+                    </span>
                   </div>
+                  {state?.tax > 0 && (
+                    <div className="flex justify-between text-gray-600">
+                      <span>Tax (5%)</span>
+                      <span>₹{state.tax}</span>
+                    </div>
+                  )}
                 </div>
                 <div className="flex justify-between text-xl font-bold text-gray-900 mt-4">
                   <span>Total</span>

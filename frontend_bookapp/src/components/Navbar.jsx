@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { getCurrentUser, logout } from "../services/auth";
 import { ShoppingCart, BookOpen, Menu, X, Truck, User, LogOut, LayoutDashboard, Package } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import api from "../services/api";
 
 export default function Navbar() {
   const user = getCurrentUser();
@@ -37,6 +38,33 @@ export default function Navbar() {
   const isAdmin = user?.role === "ADMIN";
   const isDelivery = !!deliveryAgent;
   const isVendor = !!vendorToken;
+
+  // Cart count state
+  const [cartCount, setCartCount] = useState(0);
+
+  // Fetch cart count for regular users
+  useEffect(() => {
+    if (isUser && !isAdmin && !isDelivery && !isVendor && user?.id) {
+      fetchCartCount();
+
+      // Listen for cart updates from other components
+      const handleCartUpdate = () => fetchCartCount();
+      window.addEventListener('cartUpdated', handleCartUpdate);
+
+      return () => window.removeEventListener('cartUpdated', handleCartUpdate);
+    }
+  }, [isUser, isAdmin, isDelivery, isVendor, user?.id]);
+
+  const fetchCartCount = async () => {
+    try {
+      const response = await api.get(`/cart/${user.id}`);
+      const cartItems = response.data || [];
+      setCartCount(cartItems.length);
+    } catch (error) {
+      console.error("Failed to fetch cart count:", error);
+      setCartCount(0);
+    }
+  };
 
   const vendorLogout = () => {
     localStorage.removeItem("vendorToken");
@@ -150,7 +178,15 @@ export default function Navbar() {
                 {isUser && !isAdmin && !isDelivery && !isVendor && (
                   <Link to="/cart" className="relative group p-2 rounded-full hover:bg-amber-50 transition-colors">
                     <ShoppingCart size={22} className="text-gray-700 group-hover:text-amber-700 transition-colors" />
-                    {/* Badge could go here */}
+                    {cartCount > 0 && (
+                      <motion.span
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-lg"
+                      >
+                        {cartCount > 9 ? '9+' : cartCount}
+                      </motion.span>
+                    )}
                   </Link>
                 )}
 

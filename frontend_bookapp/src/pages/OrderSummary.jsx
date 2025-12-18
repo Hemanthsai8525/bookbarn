@@ -53,9 +53,14 @@ export default function OrderSummary() {
     return { ...item, title: book.title || "Loading...", price: book.price || 0, image: book.image };
   }
 
-  const total = isBuyNow
+  // Use passed totals from Cart if available, otherwise calculate
+  const subtotal = state?.subtotal || (isBuyNow
     ? state.total
-    : items.reduce((sum, item) => sum + (getItemDetails(item).price * item.quantity), 0);
+    : items.reduce((sum, item) => sum + (getItemDetails(item).price * item.quantity), 0));
+
+  const shipping = state?.shipping !== undefined ? state.shipping : (subtotal > 500 ? 0 : 50);
+  const tax = state?.tax !== undefined ? state.tax : Math.round(subtotal * 0.05);
+  const total = state?.total || (subtotal + shipping + tax);
 
   if (loading) return <Layout><div className="flex justify-center py-20">Loading...</div></Layout>;
 
@@ -96,13 +101,31 @@ export default function OrderSummary() {
             </div>
 
             <div className="bg-gray-50 p-8 border-t border-gray-200">
-              <div className="flex justify-between items-center mb-6">
-                <span className="text-gray-600 font-medium">Total Amount</span>
-                <span className="text-3xl font-black text-gray-900">₹{total}</span>
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Order Breakdown</h3>
+              <div className="space-y-3 mb-6">
+                <div className="flex justify-between text-gray-600">
+                  <span>Subtotal</span>
+                  <span>₹{subtotal}</span>
+                </div>
+                <div className="flex justify-between text-gray-600">
+                  <span>Shipping</span>
+                  <span className={shipping === 0 ? "text-green-600 font-medium" : ""}>
+                    {shipping === 0 ? "Free" : `₹${shipping}`}
+                  </span>
+                </div>
+                <div className="flex justify-between text-gray-600">
+                  <span>Tax (5%)</span>
+                  <span>₹{tax}</span>
+                </div>
+                <div className="h-px bg-gray-200 my-2"></div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-900 font-bold text-lg">Total Amount</span>
+                  <span className="text-3xl font-black text-gray-900">₹{total}</span>
+                </div>
               </div>
 
               <button
-                onClick={() => navigate("/checkout", { state: { items, total, buyNow: isBuyNow } })}
+                onClick={() => navigate("/checkout", { state: { items, subtotal, shipping, tax, total, buyNow: isBuyNow } })}
                 className="w-full btn-primary py-4 text-lg shadow-lg hover:shadow-xl hover:scale-[1.02] transform transition-all"
               >
                 Proceed to Payment
@@ -120,5 +143,3 @@ export default function OrderSummary() {
     </Layout>
   );
 }
-
-

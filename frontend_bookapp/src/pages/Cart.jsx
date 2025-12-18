@@ -49,6 +49,7 @@ export default function Cart() {
     api.post("/cart/update", { id: item.id, userId: item.userId, bookId: item.bookId, quantity: newQty })
       .then(r => {
         // Confirm with server data if needed, but optimistic is smoother
+        window.dispatchEvent(new Event('cartUpdated'));
       })
       .catch((e) => {
         console.error("Update failed", e);
@@ -59,7 +60,11 @@ export default function Cart() {
 
   function deleteItem(id) {
     setItems(items.filter(i => i.id !== id)); // Optimistic
-    api.delete(`/cart/${id}`).catch(() => loadCart()); // Revert if failed
+    api.delete(`/cart/${id}`)
+      .then(() => {
+        window.dispatchEvent(new Event('cartUpdated'));
+      })
+      .catch(() => loadCart()); // Revert if failed
   }
 
   // Calculations
@@ -206,7 +211,15 @@ export default function Cart() {
               </div>
 
               <button
-                onClick={() => navigate("/order-summary")}
+                onClick={() => navigate("/order-summary", {
+                  state: {
+                    subtotal,
+                    shipping,
+                    tax,
+                    total,
+                    fromCart: true
+                  }
+                })}
                 className="w-full btn-primary flex items-center justify-center gap-2 group"
               >
                 Checkout <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />

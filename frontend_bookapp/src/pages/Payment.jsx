@@ -60,7 +60,7 @@ export default function Payment() {
       if (paymentMethod === "CARD") {
         await api.post("/payment/process", {
           cardNumber: card.number.replace(/\s/g, ""),
-          amount: state?.total || 0
+          amount: state?.total || orderData?.total || 0
         });
       }
 
@@ -99,12 +99,12 @@ export default function Payment() {
       localStorage.setItem("order_final", JSON.stringify({
         ...orderData,
         payment: paymentData,
-        total: state?.total || total, // prefer passed total which has shipping etc
+        total: state?.total || orderData?.total || total, // prefer passed total which has shipping etc
         items: state?.items || items
       }));
 
       // MANUAL CLEAR CART (if needed by backend logic)
-      if (!state?.buyNow) {
+      if (!(state?.buyNow || orderData?.buyNow)) {
         for (const item of items) {
           await api.delete(`/cart/${item.id}`).catch(e => console.warn(e));
         }
@@ -143,7 +143,7 @@ export default function Payment() {
           <div className="p-8 space-y-6">
             <div className="flex justify-between items-center border-b pb-4">
               <span className="text-gray-600 font-medium">Total Amount</span>
-              <span className="text-2xl font-bold text-gray-900">₹{state?.total}</span>
+              <span className="text-2xl font-bold text-gray-900">₹{state?.total || orderData?.total}</span>
             </div>
 
             {/* Payment Method Selection */}
