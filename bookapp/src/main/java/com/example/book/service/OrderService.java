@@ -51,6 +51,8 @@ public class OrderService {
 			Book b = bookRepo.findById(ci.getBookId())
 					.orElseThrow(() -> new RuntimeException("Book not found: " + ci.getBookId()));
 
+			ci.setBook(b); // Ensure book is available for later steps
+
 			// Check and deduct stock
 			bookService.deductStock(ci.getBookId(), ci.getQuantity());
 
