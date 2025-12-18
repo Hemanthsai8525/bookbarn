@@ -21,9 +21,11 @@ export default function BookCard({ book, onAdd }) {
       <Link to={`/book/${book.id}`} className="relative block overflow-hidden aspect-[2/3]">
         <img
           src={
-            book.image?.startsWith("http")
-              ? book.image
-              : `https://bookapp-production-3e11.up.railway.app${book.image}`
+            !book.image
+              ? "https://via.placeholder.com/300x450?text=No+Cover"
+              : book.image.startsWith("http")
+                ? book.image
+                : `https://bookapp-production-3e11.up.railway.app${book.image}`
           }
           alt={book.title}
           className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 ${isOutOfStock ? "grayscale opacity-60" : ""
