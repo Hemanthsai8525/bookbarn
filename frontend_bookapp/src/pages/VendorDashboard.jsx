@@ -1,7 +1,7 @@
 ﻿import React, { useEffect, useState } from "react";
 import api from "../services/api";
 import { useNavigate } from "react-router-dom";
-import { BookOpen, LogOut, Package, Plus, Search, DollarSign, Image as ImageIcon, X, TrendingUp, Edit2, Trash2, ShoppingBag, CheckCircle, RefreshCw } from "lucide-react";
+import { BookOpen, LogOut, Package, Plus, Search, DollarSign, Image as ImageIcon, X, TrendingUp, Edit2, Trash2, ShoppingBag, CheckCircle, RefreshCw, Bell } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function VendorDashboard() {
