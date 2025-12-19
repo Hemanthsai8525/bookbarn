@@ -22,6 +22,7 @@ public class OrderService {
 	private final OrderHistoryRepository historyRepo;
 	private final BookService bookService;
 	private final com.example.book.repository.DeliveryAgentRepository deliveryRepo;
+	private final com.example.book.repository.NotificationRepository notificationRepo;
 
 	public OrderService(OrderRepository repo, CartRepository cartRepo, BookRepository bookRepo,
 			OrderHistoryRepository historyRepo, BookService bookService,
