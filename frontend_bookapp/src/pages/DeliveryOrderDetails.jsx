@@ -103,12 +103,10 @@ export default function DeliveryOrderDetails() {
       <div className="max-w-4xl mx-auto space-y-6">
 
         <div className="bg-white p-6 rounded-xl shadow-sm border">
-          <div className="flex justify-between items-start">
+          <div className="flex justify-between items-start mb-6">
             <div>
               <h2 className="text-2xl font-bold">Order #{order.id}</h2>
               <div className="text-sm text-gray-500 mt-1">Placed by <span className="font-semibold">{order.userName || order.userId}</span></div>
-              <div className="mt-2 text-sm text-gray-700">Address: {order.address}</div>
-              <div className="text-sm text-gray-700">Phone: <a href={`tel:${order.phone}`} className="text-blue-600 hover:underline font-medium">{order.phone}</a></div>
             </div>
             <div className="text-right">
               <div className="text-sm text-gray-500">Total</div>
@@ -124,6 +122,82 @@ export default function DeliveryOrderDetails() {
                 <span className={`px-3 py-1 rounded-full text-xs font-semibold ${currentStatus === 'DELIVERED' ? 'bg-green-100 text-green-700' : currentStatus === 'SHIPPED' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'}`}>
                   {currentStatus}
                 </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Pickup & Delivery Addresses */}
+          <div className="grid md:grid-cols-2 gap-4 mb-6 pb-6 border-b">
+            {/* Pickup Address (Vendor Store) */}
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 p-4 rounded-xl border border-blue-200">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                  </svg>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-sm font-black text-blue-900 uppercase tracking-wide mb-1">📦 Pickup From</h3>
+                  {order.items && order.items.length > 0 && order.items[0].book?.vendor ? (
+                    <>
+                      <p className="font-bold text-gray-900 mb-1">{order.items[0].book.vendor.name}</p>
+                      <p className="text-sm text-gray-700 mb-2 leading-relaxed">{order.items[0].book.vendor.address || 'Address not available'}</p>
+                      {order.items[0].book.vendor.phone && (
+                        <a href={`tel:${order.items[0].book.vendor.phone}`} className="text-xs text-blue-700 hover:text-blue-900 font-semibold block mb-2">
+                          📞 {order.items[0].book.vendor.phone}
+                        </a>
+                      )}
+                      {order.items[0].book.vendor.address && (
+                        <a
+                          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(order.items[0].book.vendor.address)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition-all shadow-sm"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+                          </svg>
+                          Navigate
+                        </a>
+                      )}
+                    </>
+                  ) : (
+                    <p className="text-sm text-gray-500 italic">Vendor information not available</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Delivery Address (Customer) */}
+            <div className="bg-gradient-to-br from-emerald-50 to-emerald-100/50 p-4 rounded-xl border border-emerald-200">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 bg-emerald-600 rounded-full flex items-center justify-center flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z"></path>
+                    <path d="m3 9 2.45-4.9A2 2 0 0 1 7.24 3h9.52a2 2 0 0 1 1.8 1.1L21 9"></path>
+                    <path d="M12 3v6"></path>
+                  </svg>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-sm font-black text-emerald-900 uppercase tracking-wide mb-1">🏠 Deliver To</h3>
+                  <p className="font-bold text-gray-900 mb-1">{order.userName || 'Customer'}</p>
+                  <p className="text-sm text-gray-700 mb-2 leading-relaxed">{order.address}</p>
+                  <a href={`tel:${order.phone}`} className="text-xs text-emerald-700 hover:text-emerald-900 font-semibold block mb-2">
+                    📞 {order.phone}
+                  </a>
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(order.address)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition-all shadow-sm"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+                    </svg>
+                    Navigate
+                  </a>
+                </div>
               </div>
             </div>
           </div>
