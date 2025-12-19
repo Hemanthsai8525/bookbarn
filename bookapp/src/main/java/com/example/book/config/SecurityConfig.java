@@ -69,7 +69,13 @@ public class SecurityConfig {
 				.requestMatchers("/delivery/**").hasRole("DELIVERY_AGENT")
 
 				// ---------- ORDERS / CART ----------
-				.requestMatchers("/orders", "/orders/**").hasAnyRole("USER", "ADMIN")
+				.requestMatchers("/orders/delivery/**", "/orders/assign-agent").hasAnyRole("DELIVERY_AGENT", "ADMIN")
+				.requestMatchers("/orders/vendor/**").hasAnyRole("VENDOR", "ADMIN")
+				.requestMatchers("/orders/update-status").hasAnyRole("VENDOR", "DELIVERY_AGENT", "ADMIN")
+				.requestMatchers("/orders/place").hasAnyRole("USER", "ADMIN")
+				.requestMatchers("/orders/user/**").hasAnyRole("USER", "ADMIN")
+				.requestMatchers("/orders/{orderId}").authenticated()
+				.requestMatchers("/orders").hasRole("ADMIN")
 				.requestMatchers("/cart", "/cart/**").hasAnyRole("USER", "ADMIN")
 
 				// ---------- EVERYTHING ELSE ----------
