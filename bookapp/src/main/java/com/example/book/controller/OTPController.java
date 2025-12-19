@@ -9,8 +9,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/otp")
-@CrossOrigin(origins = { "http://localhost:5173", "http://localhost:3000",
-        "https://*.netlify.app", }, allowCredentials = "true")
 public class OTPController {
 
     @Autowired
