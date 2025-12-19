@@ -22,63 +22,93 @@ export default function Checkout() {
 
     setLoadingLocation(true);
 
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude } = position.coords;
-
-        try {
-          // Using OpenStreetMap's Nominatim API for reverse geocoding (free, no API key needed)
-          const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`
-          );
-          const data = await response.json();
-
-          if (data && data.display_name) {
-            // Format the address nicely
-            const addr = data.address;
-            const formattedAddress = [
-              addr.house_number,
-              addr.road,
-              addr.suburb || addr.neighbourhood,
-              addr.city || addr.town || addr.village,
-              addr.state,
-              addr.postcode,
-              addr.country
-            ].filter(Boolean).join(", ");
-
-            setAddress(formattedAddress || data.display_name);
+    // Try with high accuracy first, fallback to lower accuracy if timeout
+    const tryGetLocation = (useHighAccuracy, timeout) => {
+      return new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(
+          resolve,
+          reject,
+          {
+            enableHighAccuracy: useHighAccuracy,
+            timeout: timeout,
+            maximumAge: 30000 // Accept cached position up to 30 seconds old
           }
-        } catch (error) {
-          console.error("Error fetching address:", error);
-          alert("Failed to fetch address. Please enter manually.");
-        } finally {
-          setLoadingLocation(false);
-        }
-      },
-      (error) => {
-        setLoadingLocation(false);
-        let errorMessage = "Unable to retrieve your location";
+        );
+      });
+    };
 
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            errorMessage = "Location permission denied. Please enable location access in your browser settings.";
-            break;
-          case error.POSITION_UNAVAILABLE:
-            errorMessage = "Location information is unavailable.";
-            break;
-          case error.TIMEOUT:
-            errorMessage = "Location request timed out.";
-            break;
+    try {
+      let position;
+      try {
+        // First attempt: High accuracy with 15 second timeout
+        position = await tryGetLocation(true, 15000);
+      } catch (firstError) {
+        if (firstError.code === 3) { // TIMEOUT
+          // Second attempt: Lower accuracy with 20 second timeout
+          console.log("High accuracy timed out, trying lower accuracy...");
+          position = await tryGetLocation(false, 20000);
+        } else {
+          throw firstError;
         }
-
-        alert(errorMessage);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0
       }
-    );
+
+      const { latitude, longitude } = position.coords;
+
+      try {
+        // Using OpenStreetMap's Nominatim API for reverse geocoding
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`,
+          {
+            headers: {
+              'User-Agent': 'BookBarn App'
+            }
+          }
+        );
+        const data = await response.json();
+
+        if (data && data.display_name) {
+          // Format the address nicely
+          const addr = data.address;
+          const formattedAddress = [
+            addr.house_number,
+            addr.road,
+            addr.suburb || addr.neighbourhood,
+            addr.city || addr.town || addr.village,
+            addr.state,
+            addr.postcode,
+            addr.country
+          ].filter(Boolean).join(", ");
+
+          setAddress(formattedAddress || data.display_name);
+        } else {
+          throw new Error("No address data received");
+        }
+      } catch (error) {
+        console.error("Error fetching address:", error);
+        // Provide coordinates as fallback
+        const fallbackAddress = `Lat: ${latitude.toFixed(6)}, Long: ${longitude.toFixed(6)}`;
+        setAddress(fallbackAddress);
+        alert("Could not fetch full address. Coordinates have been filled. Please complete the address manually.");
+      }
+    } catch (error) {
+      let errorMessage = "Unable to retrieve your location";
+
+      switch (error.code) {
+        case 1: // PERMISSION_DENIED
+          errorMessage = "Location permission denied. Please enable location access in your browser settings.";
+          break;
+        case 2: // POSITION_UNAVAILABLE
+          errorMessage = "Location information is unavailable. Please ensure GPS is enabled.";
+          break;
+        case 3: // TIMEOUT
+          errorMessage = "Location request timed out. Please try again or enter address manually.";
+          break;
+      }
+
+      alert(errorMessage);
+    } finally {
+      setLoadingLocation(false);
+    }
   }
 
   async function confirmOrder() {
