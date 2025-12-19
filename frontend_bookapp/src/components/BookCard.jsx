@@ -6,10 +6,10 @@ import { ShoppingCart } from "lucide-react";
 export default function BookCard({ book, onAdd }) {
   const user = JSON.parse(localStorage.getItem("user") || "null");
   const delivery = JSON.parse(localStorage.getItem("deliveryAgent") || "null");
-  const vendor = JSON.parse(localStorage.getItem("vendor") || "null");
+  const vendorToken = localStorage.getItem("vendorToken");
   const isAdmin = user?.role?.toLowerCase() === "admin";
   const isDelivery = !!delivery;
-  const isVendor = !!vendor;
+  const isVendor = !!vendorToken;
   const isOutOfStock = book.stock === 0;
   const isLowStock = book.stock > 0 && book.stock < 5;
 

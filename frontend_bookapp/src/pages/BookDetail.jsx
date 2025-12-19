@@ -11,10 +11,10 @@ export default function BookDetail() {
 
   const user = JSON.parse(localStorage.getItem("user") || "null");
   const delivery = JSON.parse(localStorage.getItem("deliveryAgent") || "null");
-  const vendor = JSON.parse(localStorage.getItem("vendor") || "null");
+  const vendorToken = localStorage.getItem("vendorToken");
   const isAdmin = user?.role?.toLowerCase() === "admin";
   const isDelivery = !!delivery;
-  const isVendor = !!vendor;
+  const isVendor = !!vendorToken;
 
   useEffect(() => {
     api.get(`/books/${id}`)
