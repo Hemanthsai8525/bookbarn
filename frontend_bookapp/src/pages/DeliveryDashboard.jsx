@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 export default function DeliveryDashboard() {
   const [assigned, setAssigned] = useState([]);
   const [available, setAvailable] = useState([]);
+  const [filter, setFilter] = useState("");
   const [loading, setLoading] = useState(true);
   const agent = JSON.parse(localStorage.getItem("deliveryAgent"));
   const navigate = useNavigate();
@@ -135,25 +136,38 @@ export default function DeliveryDashboard() {
               Available for Pickup
             </h2>
 
-            {available.length === 0 ? (
+            {/* Filter Input */}
+            <div className="mb-4">
+              <input
+                type="text"
+                placeholder="Filter by location (e.g., Downtown, 5th Ave)"
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium text-sm"
+              />
+            </div>
+
+            {available.filter(o => !filter || o.address.toLowerCase().includes(filter.toLowerCase())).length === 0 ? (
               <div className="text-center py-16 bg-white rounded-3xl border border-dashed border-gray-200">
                 <p className="text-gray-400 font-medium italic">Scanning for new orders...</p>
               </div>
-            ) : available.map(o => (
-              <div key={o.id} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:border-emerald-300 transition-all flex justify-between items-center group shadow-sm hover:shadow-lg">
-                <div className="space-y-1">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">Payout: ₹{Math.floor(o.total * 0.05 + 50)}</span>
-                  <h4 className="text-lg font-bold text-gray-900">Order #{o.id}</h4>
-                  <p className="text-sm text-gray-500 font-medium">{o.address.split(',')[0]}...</p>
+            ) : available
+              .filter(o => !filter || o.address.toLowerCase().includes(filter.toLowerCase()))
+              .map(o => (
+                <div key={o.id} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:border-emerald-300 transition-all flex justify-between items-center group shadow-sm hover:shadow-lg">
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">Payout: ₹{Math.floor(o.total * 0.05 + 50)}</span>
+                    <h4 className="text-lg font-bold text-gray-900">Order #{o.id}</h4>
+                    <p className="text-sm text-gray-500 font-medium">{o.address.split(',')[0]}...</p>
+                  </div>
+                  <button
+                    onClick={() => takeOrder(o.id)}
+                    className="px-6 py-3 bg-gray-900 hover:bg-emerald-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-lg active:scale-95"
+                  >
+                    Accept Delivery
+                  </button>
                 </div>
-                <button
-                  onClick={() => takeOrder(o.id)}
-                  className="px-6 py-3 bg-gray-900 hover:bg-emerald-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-lg active:scale-95"
-                >
-                  Accept Delivery
-                </button>
-              </div>
-            ))}
+              ))}
           </section>
         </div>
       </div>
