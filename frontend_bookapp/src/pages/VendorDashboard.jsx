@@ -1,5 +1,5 @@
 ﻿import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../services/api";
 import { useNavigate } from "react-router-dom";
 import { BookOpen, LogOut, Package, Plus, Search, DollarSign, Image as ImageIcon, X, TrendingUp, Edit2, Trash2, ShoppingBag, CheckCircle, RefreshCw } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -57,32 +57,31 @@ export default function VendorDashboard() {
 
     const fetchNotifications = async () => {
         try {
-            // Get vendor ID from profile (cached if possible, but for reliability we fetch)
-            // Note: In a real app we'd decode the JWT or store vendorId in localStorage on login
-            const profileRes = await axios.get("https://bookapp-production-3e11.up.railway.app/vendor/profile", {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            const vendorId = profileRes.data.id;
+            const profileRes = await api.get("/vendor/profile");
+            const vId = profileRes.data.id;
 
-            const res = await axios.get(`https://bookapp-production-3e11.up.railway.app/notifications/vendor/${vendorId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await api.get(`/notifications/vendor/${vId}`);
             setNotifications(res.data);
         } catch (err) {
             console.error("Failed to fetch notifications", err);
         }
     }
 
+    const markNotificationRead = async (id) => {
+        try {
+            await api.put(`/notifications/${id}/read`);
+            setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
+        } catch (err) {
+            console.error("Failed to mark as read", err);
+        }
+    };
+
     const fetchOrders = async () => {
         try {
-            const profileRes = await axios.get("https://bookapp-production-3e11.up.railway.app/vendor/profile", {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const profileRes = await api.get("/vendor/profile");
             const vId = profileRes.data.id;
 
-            const res = await axios.get(`https://bookapp-production-3e11.up.railway.app/orders/vendor/${vId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await api.get(`/orders/vendor/${vId}`);
             setOrders(res.data);
         } catch (err) {
             console.error("Failed to fetch orders", err);
@@ -91,9 +90,7 @@ export default function VendorDashboard() {
 
     const handleAcceptOrder = async (orderId) => {
         try {
-            await axios.post(`https://bookapp-production-3e11.up.railway.app/orders/update-status?id=${orderId}&status=READY_FOR_DELIVERY`, {}, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await api.post(`/orders/update-status?id=${orderId}&status=READY_FOR_DELIVERY`);
             // Update local state immediately
             setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: 'READY_FOR_DELIVERY' } : o));
             setMessage("Order accepted and marked ready for delivery!");
@@ -106,9 +103,7 @@ export default function VendorDashboard() {
     const fetchMyBooks = async () => {
         setLoading(true);
         try {
-            const res = await axios.get("https://bookapp-production-3e11.up.railway.app/vendor/my-books", {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await api.get("/vendor/my-books");
             setBooks(res.data);
         } catch (err) {
             console.error("Failed to fetch books", err);
@@ -146,14 +141,10 @@ export default function VendorDashboard() {
         e.preventDefault();
         try {
             if (isEditing) {
-                await axios.put(`https://bookapp-production-3e11.up.railway.app/vendor/books/${currentBookId}`, formData, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                await api.put(`/vendor/books/${currentBookId}`, formData);
                 setMessage("Book updated successfully!");
             } else {
-                await axios.post("https://bookapp-production-3e11.up.railway.app/vendor/books", formData, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                await api.post("/vendor/books", formData);
                 setMessage("Book added successfully!");
             }
 
@@ -168,9 +159,7 @@ export default function VendorDashboard() {
     const handleDelete = async (id) => {
         if (!window.confirm("Are you sure you want to delete this book?")) return;
         try {
-            await axios.delete(`https://bookapp-production-3e11.up.railway.app/vendor/books/${id}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await api.delete(`/vendor/books/${id}`);
             setMessage("Book deleted successfully!");
             fetchMyBooks();
             setTimeout(() => setMessage(""), 3000);
@@ -252,15 +241,28 @@ export default function VendorDashboard() {
                     </div>
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                         {notifications.length === 0 ? (
-                            <div className="p-6 text-center text-gray-500">No new notifications</div>
+                            <div className="p-12 text-center text-gray-500 flex flex-col items-center">
+                                <Bell size={40} className="text-gray-200 mb-3" />
+                                <p className="font-medium">No new alerts</p>
+                            </div>
                         ) : (
-                            <div className="divide-y divide-gray-100 max-h-60 overflow-y-auto">
+                            <div className="divide-y divide-gray-100 max-h-80 overflow-y-auto">
                                 {notifications.map((n) => (
-                                    <div key={n.id} className="p-4 hover:bg-gray-50 flex items-start gap-3 transition-colors">
-                                        <div className="mt-1 w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />
-                                        <div>
-                                            <p className="text-gray-800 font-medium text-sm">{n.message}</p>
-                                            <p className="text-xs text-gray-400 mt-1">{new Date(n.timestamp).toLocaleString()}</p>
+                                    <div
+                                        key={n.id}
+                                        onClick={() => !n.isRead && markNotificationRead(n.id)}
+                                        className={`p-4 hover:bg-gray-50 flex items-start gap-4 transition-colors cursor-pointer relative ${!n.isRead ? 'bg-blue-50/20' : ''}`}
+                                    >
+                                        {!n.isRead && (
+                                            <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-blue-600 flex-shrink-0" />
+                                        )}
+                                        <div className={!n.isRead ? '' : 'pl-3'}>
+                                            <p className={`text-sm leading-relaxed ${!n.isRead ? 'text-gray-900 font-bold' : 'text-gray-600 font-medium'}`}>
+                                                {n.message}
+                                            </p>
+                                            <p className="text-xs text-gray-400 mt-2 font-bold uppercase tracking-wider">
+                                                {new Date(n.timestamp).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
+                                            </p>
                                         </div>
                                     </div>
                                 ))}
@@ -411,9 +413,9 @@ export default function VendorDashboard() {
                                                 <div className="flex items-center gap-3">
                                                     <span className="text-lg font-bold text-gray-900">Order #{o.id}</span>
                                                     <span className={`px-3 py-1 rounded-full text-xs font-bold ${o.status === 'PENDING' ? 'bg-amber-100 text-amber-700' :
-                                                            o.status === 'READY_FOR_DELIVERY' ? 'bg-blue-100 text-blue-700' :
-                                                                o.status === 'SHIPPED' ? 'bg-purple-100 text-purple-700' :
-                                                                    'bg-green-100 text-green-700'
+                                                        o.status === 'READY_FOR_DELIVERY' ? 'bg-blue-100 text-blue-700' :
+                                                            o.status === 'SHIPPED' ? 'bg-purple-100 text-purple-700' :
+                                                                'bg-green-100 text-green-700'
                                                         }`}>
                                                         {o.status.replace(/_/g, " ")}
                                                     </span>

@@ -81,6 +81,7 @@ export default function Navbar() {
   // Notification State
   const [notifications, setNotifications] = useState([]);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [vendorId, setVendorId] = useState(null);
   const notifRef = useRef(null);
 
   // Poll for notifications if Vendor
@@ -89,12 +90,12 @@ export default function Navbar() {
 
     const fetchNotifs = async () => {
       try {
-        // If we don't have vendorId but have token, we might need to fetch profile first
-        // But for Navbar speed, we check localStorage or lazy load
-        // Ideally we cache vendorId in localStorage on login.
-        // Fallback: try to get profile
-        const response = await api.get("/vendor/profile");
-        const vId = response.data.id;
+        let vId = vendorId;
+        if (!vId) {
+          const response = await api.get("/vendor/profile");
+          vId = response.data.id;
+          setVendorId(vId);
+        }
 
         const notifRes = await api.get(`/notifications/vendor/${vId}`);
         setNotifications(notifRes.data);
@@ -106,7 +107,26 @@ export default function Navbar() {
     fetchNotifs();
     const interval = setInterval(fetchNotifs, 30000);
     return () => clearInterval(interval);
-  }, [isVendor]);
+  }, [isVendor, vendorId]);
+
+  const markRead = async (id) => {
+    try {
+      await api.put(`/notifications/${id}/read`);
+      setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
+    } catch (e) {
+      console.error("Failed to mark as read", e);
+    }
+  };
+
+  const markAllRead = async () => {
+    if (!vendorId) return;
+    try {
+      await api.post(`/notifications/vendor/${vendorId}/read-all`);
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+    } catch (e) {
+      console.error("Failed to mark all as read", e);
+    }
+  };
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -246,21 +266,47 @@ export default function Navbar() {
                           exit={{ opacity: 0, y: 10, scale: 0.95 }}
                           className="absolute right-0 mt-4 w-80 glass-panel overflow-hidden py-2 z-50 origin-top-right ring-1 ring-black/5 bg-white shadow-xl rounded-2xl"
                         >
-                          <div className="px-4 py-2 border-b border-gray-100 flex justify-between items-center">
+                          <div className="px-4 py-3 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
                             <h4 className="font-bold text-gray-900">Notifications</h4>
-                            <span className="text-xs text-gray-500">{notifications.length} New</span>
+                            {notifications.some(n => !n.isRead) && (
+                              <button
+                                onClick={markAllRead}
+                                className="text-[10px] font-black uppercase tracking-widest text-amber-700 hover:text-amber-800"
+                              >
+                                Mark all read
+                              </button>
+                            )}
                           </div>
-                          <div className="max-h-[300px] overflow-y-auto">
+                          <div className="max-h-[350px] overflow-y-auto">
                             {notifications.length === 0 ? (
-                              <div className="p-4 text-center text-gray-400 text-sm">No notifications</div>
+                              <div className="p-8 text-center">
+                                <Bell size={32} className="mx-auto text-gray-200 mb-3" />
+                                <p className="text-sm text-gray-400 font-medium">No system alerts</p>
+                              </div>
                             ) : (
-                              notifications.map((n, i) => (
-                                <div key={i} className="px-4 py-3 hover:bg-gray-50 border-b border-gray-50 last:border-0 transition-colors">
-                                  <p className="text-sm text-gray-800 line-clamp-2">{n.message}</p>
-                                  <p className="text-xs text-gray-400 mt-1">{new Date(n.timestamp).toLocaleString()}</p>
+                              notifications.map((n) => (
+                                <div
+                                  key={n.id}
+                                  onClick={() => !n.isRead && markRead(n.id)}
+                                  className={`relative px-4 py-4 hover:bg-amber-50/30 border-b border-gray-50 last:border-0 transition-colors cursor-pointer group ${!n.isRead ? 'bg-amber-50/10' : ''}`}
+                                >
+                                  {!n.isRead && (
+                                    <div className="absolute left-1.5 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-amber-600 rounded-full shadow-[0_0_8px_rgba(217,119,6,0.5)]"></div>
+                                  )}
+                                  <p className={`text-sm leading-relaxed ${!n.isRead ? 'text-gray-900 font-bold' : 'text-gray-600 font-medium'}`}>
+                                    {n.message}
+                                  </p>
+                                  <p className="text-[10px] text-gray-400 mt-2 font-bold uppercase tracking-wider">
+                                    {new Date(n.timestamp).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
+                                  </p>
                                 </div>
                               ))
                             )}
+                          </div>
+                          <div className="p-2 bg-gray-50 border-t border-gray-100 text-center">
+                            <Link to="/vendor/dashboard" className="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-amber-700 transition-colors">
+                              View Dashboard Details
+                            </Link>
                           </div>
                         </motion.div>
                       )}

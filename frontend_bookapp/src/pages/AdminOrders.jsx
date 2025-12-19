@@ -37,7 +37,8 @@ export default function AdminOrders() {
 
   const STATUS_COLORS = {
     PENDING: "bg-yellow-100 text-yellow-800 border-yellow-200",
-    CONFIRMED: "bg-blue-100 text-blue-800 border-blue-200",
+    CONFIRMED: "bg-indigo-100 text-indigo-800 border-indigo-200",
+    READY_FOR_DELIVERY: "bg-blue-100 text-blue-800 border-blue-200",
     SHIPPED: "bg-purple-100 text-purple-800 border-purple-200",
     DELIVERED: "bg-green-100 text-green-800 border-green-200",
     CANCELLED: "bg-red-100 text-red-800 border-red-200"
@@ -66,7 +67,7 @@ export default function AdminOrders() {
 
             {/* Filter Pills in Header */}
             <div className="bg-white/10 backdrop-blur-md p-1 rounded-xl border border-white/10 flex overflow-x-auto max-w-full">
-              {["ALL", "PENDING", "CONFIRMED", "SHIPPED", "DELIVERED"].map(f => (
+              {["ALL", "PENDING", "CONFIRMED", "READY_FOR_DELIVERY", "SHIPPED", "DELIVERED"].map(f => (
                 <button
                   key={f}
                   onClick={() => setFilter(f)}
@@ -134,10 +135,23 @@ export default function AdminOrders() {
                       <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Status</p>
                       <span className={`px-3 py-1 rounded-full text-xs font-bold border inline-flex items-center gap-1.5 ${STATUS_COLORS[order.status] || "bg-gray-100"}`}>
                         <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
-                        {order.status}
+                        {order.status?.replaceAll("_", " ")}
                       </span>
                     </div>
                   </div>
+
+                  {/* Delivery Agent Info - Desktop */}
+                  {order.assignedAgent && (
+                    <div className="hidden lg:flex flex-col items-center bg-amber-50 rounded-xl p-3 border border-amber-100 min-w-[150px]">
+                      <p className="text-[10px] font-black text-amber-800 uppercase tracking-wider mb-2">Delivery Agent</p>
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-amber-200 flex items-center justify-center text-amber-700">
+                          <Truck size={14} />
+                        </div>
+                        <p className="text-xs font-bold text-gray-800">{order.assignedAgent.name}</p>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Actions */}
                   <div className="flex items-center gap-3 w-full md:w-auto mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-t-0 border-gray-100 justify-end">
