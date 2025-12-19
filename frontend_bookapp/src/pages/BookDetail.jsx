@@ -11,8 +11,10 @@ export default function BookDetail() {
 
   const user = JSON.parse(localStorage.getItem("user") || "null");
   const delivery = JSON.parse(localStorage.getItem("deliveryAgent") || "null");
+  const vendor = JSON.parse(localStorage.getItem("vendor") || "null");
   const isAdmin = user?.role?.toLowerCase() === "admin";
   const isDelivery = !!delivery;
+  const isVendor = !!vendor;
 
   useEffect(() => {
     api.get(`/books/${id}`)
@@ -33,6 +35,7 @@ export default function BookDetail() {
   async function addToCart() {
     if (isAdmin) { alert("Admin users cannot place orders."); return; }
     if (isDelivery) { alert("Delivery agents cannot place orders."); return; }
+    if (isVendor) { alert("Vendor users cannot place orders."); return; }
     if (Number(book.stock) === 0) { alert("This book is out of stock."); return; }
     if (!user) { window.location = "/login"; return; }
 
@@ -159,9 +162,9 @@ export default function BookDetail() {
 
               {/* Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 mt-auto">
-                {isAdmin || isDelivery ? (
+                {isAdmin || isDelivery || isVendor ? (
                   <div className="w-full py-4 bg-gray-100 text-gray-400 font-bold text-center rounded-xl border border-dashed border-gray-300">
-                    {isAdmin ? "Admin View Only" : "Delivery Agent View Only"}
+                    {isAdmin ? "Admin View Only" : isDelivery ? "Delivery Agent View Only" : "Vendor View Only"}
                   </div>
                 ) : book.stock > 0 ? (
                   <>
