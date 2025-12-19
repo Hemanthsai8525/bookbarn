@@ -27,7 +27,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 	@org.springframework.data.jpa.repository.Query("SELECT new map(o.status as status, COUNT(o) as count, SUM(o.total) as revenue) FROM Order o GROUP BY o.status")
 	List<java.util.Map<String, Object>> getOrderAnalytics();
 
-	@org.springframework.data.jpa.repository.Query("SELECT DISTINCT o FROM Order o JOIN o.items i JOIN i.book b WHERE b.vendor.id = :vendorId ORDER BY o.id DESC")
+	@org.springframework.data.jpa.repository.Query("SELECT DISTINCT o FROM Order o JOIN o.items i, Book b WHERE i.bookId = b.id AND b.vendor.id = :vendorId ORDER BY o.id DESC")
 	List<Order> findByVendorId(Long vendorId);
 
 }
