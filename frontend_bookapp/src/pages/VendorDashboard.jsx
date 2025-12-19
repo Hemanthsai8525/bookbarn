@@ -112,6 +112,20 @@ export default function VendorDashboard() {
         }
     }
 
+    const handleUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const fd = new FormData();
+        fd.append("file", file);
+        try {
+            const res = await api.post("/books/upload", fd, { headers: { "Content-Type": "multipart/form-data" } });
+            setFormData({ ...formData, image: res.data });
+        } catch (err) {
+            console.error("Upload failed", err);
+            setMessage("Upload failed: " + (err.response?.data || err.message));
+        }
+    };
+
     const handleInputChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     }
@@ -511,8 +525,26 @@ export default function VendorDashboard() {
                                             </div>
                                         </div>
                                         <div>
-                                            <label className="text-sm font-bold text-gray-700 mb-1 block">Image URL (Optional)</label>
-                                            <input name="image" value={formData.image} className="input-field" onChange={handleInputChange} placeholder="http://..." />
+                                            <label className="text-sm font-bold text-gray-700 mb-1 block">Cover Image</label>
+                                            <div className="group mt-1 border-2 border-dashed border-gray-300 rounded-2xl p-6 text-center hover:border-amber-500 hover:bg-amber-50/30 transition-all cursor-pointer relative bg-gray-50/50">
+                                                <input type="file" onChange={handleUpload} className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10" />
+                                                {formData.image ? (
+                                                    <div className="relative h-40 w-28 mx-auto shadow-lg rotate-1 group-hover:rotate-0 transition-transform duration-300">
+                                                        <img src={formData.image.startsWith("http") ? formData.image : `${import.meta.env.VITE_API_BASE || "https://bookapp-production-3e11.up.railway.app"}${formData.image}`} className="h-full w-full object-cover rounded-md" alt="Preview" />
+                                                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
+                                                            <p className="text-white text-xs font-bold">Change</p>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <div className="py-6">
+                                                        <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-3 text-gray-400 group-hover:bg-amber-100 group-hover:text-amber-600 transition-colors">
+                                                            <ImageIcon size={24} />
+                                                        </div>
+                                                        <p className="text-sm text-gray-600 font-medium">Click to upload cover</p>
+                                                        <p className="text-xs text-gray-400 mt-1">PNG, JPG up to 5MB</p>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
 
