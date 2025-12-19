@@ -363,7 +363,7 @@ export default function VendorDashboard() {
                                                             ? "https://via.placeholder.com/300x450?text=No+Cover"
                                                             : b.image.startsWith('http')
                                                                 ? b.image
-                                                                : `https://bookapp-production-3e11.up.railway.app${b.image}`
+                                                                : `${import.meta.env.VITE_API_BASE || "https://bookapp-production-3e11.up.railway.app"}${b.image}`
                                                     }
                                                     alt={b.title}
                                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"

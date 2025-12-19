@@ -165,7 +165,7 @@ export default function OrderDetails() {
                     <div key={item.id} className="p-6 flex gap-6 hover:bg-gray-50 transition-colors">
                       <div className="w-20 h-28 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
                         <img
-                          src={item.book?.image?.startsWith('http') ? item.book.image : `https://bookapp-production-3e11.up.railway.app${item.book.image}`}
+                          src={item.book?.image?.startsWith('http') ? item.book.image : `${import.meta.env.VITE_API_BASE || "https://bookapp-production-3e11.up.railway.app"}${item.book.image}`}
                           className="w-full h-full object-cover"
                           alt=""
                           onError={(e) => { e.target.onerror = null; e.target.src = "https://via.placeholder.com/150x200?text=No+Preview"; }}

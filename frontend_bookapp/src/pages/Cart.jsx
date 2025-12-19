@@ -133,7 +133,7 @@ export default function Cart() {
                   >
                     <div className="w-20 h-28 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden">
                       <img
-                        src={book.image?.startsWith("http") ? book.image : `https://bookapp-production-3e11.up.railway.app${book.image}`}
+                        src={book.image?.startsWith("http") ? book.image : `${import.meta.env.VITE_API_BASE || "https://bookapp-production-3e11.up.railway.app"}${book.image}`}
                         alt={book.title}
                         className="w-full h-full object-cover"
                         onError={(e) => { e.target.onerror = null; e.target.src = "https://via.placeholder.com/150x200?text=Book+Cover"; }}
