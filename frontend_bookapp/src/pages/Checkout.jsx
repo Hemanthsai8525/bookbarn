@@ -16,7 +16,8 @@ export default function Checkout() {
   // Get current location and convert to address
   async function getCurrentLocation() {
     if (!navigator.geolocation) {
-      alert("Geolocation is not supported by your browser");
+      // If geolocation not supported, try IP-based location directly
+      await getLocationByIP();
       return;
     }
 
@@ -46,7 +47,14 @@ export default function Checkout() {
         if (firstError.code === 3) { // TIMEOUT
           // Second attempt: Lower accuracy with 20 second timeout
           console.log("High accuracy timed out, trying lower accuracy...");
-          position = await tryGetLocation(false, 20000);
+          try {
+            position = await tryGetLocation(false, 20000);
+          } catch (secondError) {
+            // If GPS completely fails, try IP-based location
+            console.log("GPS failed, trying IP-based location...");
+            await getLocationByIP();
+            return;
+          }
         } else {
           throw firstError;
         }
@@ -80,6 +88,7 @@ export default function Checkout() {
           ].filter(Boolean).join(", ");
 
           setAddress(formattedAddress || data.display_name);
+          setLoadingLocation(false);
         } else {
           throw new Error("No address data received");
         }
@@ -89,23 +98,54 @@ export default function Checkout() {
         const fallbackAddress = `Lat: ${latitude.toFixed(6)}, Long: ${longitude.toFixed(6)}`;
         setAddress(fallbackAddress);
         alert("Could not fetch full address. Coordinates have been filled. Please complete the address manually.");
+        setLoadingLocation(false);
       }
     } catch (error) {
       let errorMessage = "Unable to retrieve your location";
 
       switch (error.code) {
         case 1: // PERMISSION_DENIED
-          errorMessage = "Location permission denied. Please enable location access in your browser settings.";
-          break;
+          errorMessage = "Location permission denied. Trying alternative method...";
+          console.log(errorMessage);
+          await getLocationByIP();
+          return;
         case 2: // POSITION_UNAVAILABLE
-          errorMessage = "Location information is unavailable. Please ensure GPS is enabled.";
-          break;
+          errorMessage = "GPS unavailable. Trying alternative method...";
+          console.log(errorMessage);
+          await getLocationByIP();
+          return;
         case 3: // TIMEOUT
-          errorMessage = "Location request timed out. Please try again or enter address manually.";
+          // Already handled above
           break;
       }
 
-      alert(errorMessage);
+      setLoadingLocation(false);
+    }
+  }
+
+  // Fallback: Get approximate location based on IP address
+  async function getLocationByIP() {
+    try {
+      // Using ipapi.co - free IP geolocation API
+      const response = await fetch('https://ipapi.co/json/');
+      const data = await response.json();
+
+      if (data && data.city) {
+        const ipBasedAddress = [
+          data.city,
+          data.region,
+          data.postal,
+          data.country_name
+        ].filter(Boolean).join(", ");
+
+        setAddress(ipBasedAddress);
+        alert(`📍 Approximate location detected: ${data.city}, ${data.region}\n\nThis is based on your internet connection. Please verify and complete your exact address.`);
+      } else {
+        throw new Error("Could not determine location");
+      }
+    } catch (error) {
+      console.error("IP-based location failed:", error);
+      alert("Unable to detect location automatically. Please enter your address manually.");
     } finally {
       setLoadingLocation(false);
     }
