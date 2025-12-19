@@ -131,3 +131,198 @@ h6 {
   box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
   font-family: 'Inter', sans-serif;
 }
+
+/* ========== MOBILE RESPONSIVE ENHANCEMENTS ========== */
+
+/* Mobile-optimized container */
+@media (max-width: 640px) {
+
+  /* Reduce padding on mobile */
+  .mobile-container {
+    @apply px-3 py-4;
+  }
+
+  /* Touch-friendly buttons */
+  button,
+  .btn-primary,
+  .btn-secondary {
+    min-height: 44px;
+    /* iOS recommended touch target */
+    min-width: 44px;
+  }
+
+  /* Larger text for readability */
+  body {
+    font-size: 16px;
+    /* Prevents zoom on iOS */
+  }
+
+  /* Stack cards vertically */
+  .grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Full-width modals on mobile */
+  .modal-content {
+    @apply w-full mx-2 max-h-[90vh] overflow-y-auto;
+  }
+
+  /* Sticky headers on mobile */
+  .mobile-sticky-header {
+    @apply sticky top-0 z-40 bg-white/95 backdrop-blur-md shadow-sm;
+  }
+
+  /* Bottom navigation spacing */
+  .mobile-bottom-spacing {
+    @apply pb-20;
+  }
+
+  /* Horizontal scroll for tables */
+  table {
+    @apply block overflow-x-auto whitespace-nowrap;
+  }
+
+  /* Compact form inputs */
+  .input-field {
+    @apply text-base;
+    /* Prevents zoom on iOS */
+  }
+
+  /* Hide on mobile */
+  .hide-mobile {
+    @apply hidden;
+  }
+
+  /* Show only on mobile */
+  .show-mobile {
+    @apply block;
+  }
+}
+
+/* Tablet and up */
+@media (min-width: 641px) {
+  .hide-desktop {
+    @apply hidden;
+  }
+
+  .show-mobile {
+    @apply hidden;
+  }
+
+  .show-desktop {
+    @apply block;
+  }
+}
+
+/* Safe area for notched devices (iPhone X+) */
+@supports (padding: max(0px)) {
+  body {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Prevent horizontal scroll */
+body {
+  overflow-x: hidden;
+}
+
+/* Touch-friendly spacing */
+.touch-spacing {
+  @apply space-y-4;
+}
+
+/* Mobile-optimized cards */
+@media (max-width: 640px) {
+  .card {
+    @apply rounded-2xl shadow-md;
+  }
+
+  /* Reduce gap in grids */
+  .gap-8 {
+    @apply gap-4;
+  }
+
+  .gap-6 {
+    @apply gap-3;
+  }
+
+  /* Smaller text on mobile */
+  .text-4xl {
+    @apply text-2xl;
+  }
+
+  .text-3xl {
+    @apply text-xl;
+  }
+
+  .text-2xl {
+    @apply text-lg;
+  }
+
+  /* Compact padding */
+  .p-8 {
+    @apply p-4;
+  }
+
+  .p-6 {
+    @apply p-4;
+  }
+
+  .px-8 {
+    @apply px-4;
+  }
+
+  .py-8 {
+    @apply py-4;
+  }
+}
+
+/* Landscape mobile optimization */
+@media (max-width: 896px) and (orientation: landscape) {
+  .landscape-compact {
+    @apply py-2;
+  }
+}
+
+/* High DPI screens */
+@media (-webkit-min-device-pixel-ratio: 2),
+(min-resolution: 192dpi) {
+  img {
+    image-rendering: -webkit-optimize-contrast;
+  }
+}
+
+/* Focus visible for accessibility */
+*:focus-visible {
+  @apply outline-2 outline-offset-2 outline-amber-500;
+}
+
+/* Prevent text selection on buttons */
+button {
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+/* Smooth transitions */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Loading spinner */
+.spinner {
+  @apply animate-spin rounded-full border-4 border-gray-200 border-t-amber-600;
+}
