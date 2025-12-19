@@ -1,7 +1,7 @@
 ﻿import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
-import { MapPin, Phone, CreditCard, ArrowRight, ShieldCheck } from "lucide-react";
+import { MapPin, Phone, CreditCard, ArrowRight, ShieldCheck, Navigation, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function Checkout() {
@@ -11,6 +11,75 @@ export default function Checkout() {
 
   const [address, setAddress] = useState(storedUser?.address || "");
   const [phone, setPhone] = useState(storedUser?.phone || "");
+  const [loadingLocation, setLoadingLocation] = useState(false);
+
+  // Get current location and convert to address
+  async function getCurrentLocation() {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser");
+      return;
+    }
+
+    setLoadingLocation(true);
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+
+        try {
+          // Using OpenStreetMap's Nominatim API for reverse geocoding (free, no API key needed)
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`
+          );
+          const data = await response.json();
+
+          if (data && data.display_name) {
+            // Format the address nicely
+            const addr = data.address;
+            const formattedAddress = [
+              addr.house_number,
+              addr.road,
+              addr.suburb || addr.neighbourhood,
+              addr.city || addr.town || addr.village,
+              addr.state,
+              addr.postcode,
+              addr.country
+            ].filter(Boolean).join(", ");
+
+            setAddress(formattedAddress || data.display_name);
+          }
+        } catch (error) {
+          console.error("Error fetching address:", error);
+          alert("Failed to fetch address. Please enter manually.");
+        } finally {
+          setLoadingLocation(false);
+        }
+      },
+      (error) => {
+        setLoadingLocation(false);
+        let errorMessage = "Unable to retrieve your location";
+
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = "Location permission denied. Please enable location access in your browser settings.";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = "Location information is unavailable.";
+            break;
+          case error.TIMEOUT:
+            errorMessage = "Location request timed out.";
+            break;
+        }
+
+        alert(errorMessage);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      }
+    );
+  }
 
   async function confirmOrder() {
     if (!address.trim() || !phone.trim()) {
@@ -70,7 +139,27 @@ export default function Checkout() {
 
               <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Delivery Address</label>
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="block text-sm font-semibold text-gray-700">Delivery Address</label>
+                    <button
+                      type="button"
+                      onClick={getCurrentLocation}
+                      disabled={loadingLocation}
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {loadingLocation ? (
+                        <>
+                          <Loader2 size={14} className="animate-spin" />
+                          Detecting...
+                        </>
+                      ) : (
+                        <>
+                          <Navigation size={14} />
+                          Use Current Location
+                        </>
+                      )}
+                    </button>
+                  </div>
                   <textarea
                     rows={4}
                     value={address}

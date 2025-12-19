@@ -1,7 +1,7 @@
 ﻿import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
-import { Store, Lock, Mail, Phone, MapPin, ArrowRight, Loader2, Building2, Send } from "lucide-react";
+import { Store, Lock, Mail, Phone, MapPin, ArrowRight, Loader2, Building2, Send, Navigation } from "lucide-react";
 import { motion } from "framer-motion";
 import OTPInput from "../components/OTPInput";
 
@@ -16,8 +16,75 @@ export default function VendorRegister() {
     });
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
+    const [loadingLocation, setLoadingLocation] = useState(false);
     const [otpSent, setOtpSent] = useState(false);
     const nav = useNavigate();
+
+    // Get current location and convert to address
+    async function getCurrentLocation() {
+        if (!navigator.geolocation) {
+            alert("Geolocation is not supported by your browser");
+            return;
+        }
+
+        setLoadingLocation(true);
+
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                const { latitude, longitude } = position.coords;
+
+                try {
+                    const response = await fetch(
+                        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`
+                    );
+                    const data = await response.json();
+
+                    if (data && data.display_name) {
+                        const addr = data.address;
+                        const formattedAddress = [
+                            addr.house_number,
+                            addr.road,
+                            addr.suburb || addr.neighbourhood,
+                            addr.city || addr.town || addr.village,
+                            addr.state,
+                            addr.postcode,
+                            addr.country
+                        ].filter(Boolean).join(", ");
+
+                        setForm({ ...form, address: formattedAddress || data.display_name });
+                    }
+                } catch (error) {
+                    console.error("Error fetching address:", error);
+                    alert("Failed to fetch address. Please enter manually.");
+                } finally {
+                    setLoadingLocation(false);
+                }
+            },
+            (error) => {
+                setLoadingLocation(false);
+                let errorMessage = "Unable to retrieve your location";
+
+                switch (error.code) {
+                    case error.PERMISSION_DENIED:
+                        errorMessage = "Location permission denied. Please enable location access.";
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        errorMessage = "Location information is unavailable.";
+                        break;
+                    case error.TIMEOUT:
+                        errorMessage = "Location request timed out.";
+                        break;
+                }
+
+                alert(errorMessage);
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            }
+        );
+    }
 
     // ================= PASSWORD VALIDATOR =================
     const isStrongPassword = (pwd) => {
@@ -218,6 +285,27 @@ export default function VendorRegister() {
 
                         {/* Address */}
                         <div className="space-y-1">
+                            <div className="flex justify-between items-center mb-1">
+                                <label className="text-sm font-semibold text-gray-700">Business Address</label>
+                                <button
+                                    type="button"
+                                    onClick={getCurrentLocation}
+                                    disabled={loadingLocation}
+                                    className="flex items-center gap-1 px-2 py-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {loadingLocation ? (
+                                        <>
+                                            <Loader2 size={12} className="animate-spin" />
+                                            Detecting...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Navigation size={12} />
+                                            Use Location
+                                        </>
+                                    )}
+                                </button>
+                            </div>
                             <div className="relative group">
                                 <MapPin className="absolute left-4 top-3.5 text-gray-400 group-focus-within:text-emerald-600 transition-colors" size={18} />
                                 <textarea
