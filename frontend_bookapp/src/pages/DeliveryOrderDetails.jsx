@@ -1,6 +1,7 @@
 ﻿// src/pages/DeliveryOrderDetails.jsx
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import api from "../services/api";
 
 function friendlyDate(iso) {
@@ -82,11 +83,15 @@ export default function DeliveryOrderDetails() {
 
   if (loading) {
     return (
-      <div className="p-6">
-        <div className="max-w-3xl mx-auto bg-white p-6 rounded shadow">
-          <div className="animate-pulse h-6 bg-gray-200 rounded w-48 mb-3" />
-          <p className="text-gray-500">Loading order...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-amber-50/30 to-gray-50">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center"
+        >
+          <div className="w-16 h-16 mx-auto mb-4 border-4 border-amber-200 border-t-amber-600 rounded-full animate-spin" />
+          <p className="text-gray-600 font-medium">Loading order details...</p>
+        </motion.div>
       </div>
     );
   }
@@ -99,10 +104,15 @@ export default function DeliveryOrderDetails() {
   ];
 
   return (
-    <div className="min-h-screen p-6 bg-gray-50">
+    <div className="min-h-screen p-6 bg-gradient-to-br from-gray-50 via-amber-50/20 to-gray-50">
       <div className="max-w-4xl mx-auto space-y-6">
 
-        <div className="bg-white p-6 rounded-xl shadow-sm border">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-white/60 hover:shadow-xl transition-shadow duration-300"
+        >
           <div className="flex justify-between items-start mb-6">
             <div>
               <h2 className="text-2xl font-bold">Order #{order.id}</h2>
@@ -226,51 +236,80 @@ export default function DeliveryOrderDetails() {
           </div>
 
           {/* Action Buttons */}
-          <div className="mt-6 flex gap-3">
-            <button
+          <div className="mt-6 flex flex-wrap gap-3">
+            <motion.button
+              whileHover={{ scale: canMarkShipped() ? 1.05 : 1 }}
+              whileTap={{ scale: canMarkShipped() ? 0.95 : 1 }}
               disabled={!canMarkShipped() || updating}
               onClick={() => updateStatus("SHIPPED")}
-              className={`px-4 py-2 rounded-md font-semibold ${canMarkShipped() ? "bg-blue-600 text-white hover:bg-blue-700" : "bg-gray-200 text-gray-500 cursor-not-allowed"}`}
+              className={`px-6 py-3 rounded-xl font-bold transition-all duration-300 ${canMarkShipped()
+                  ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:shadow-lg hover:shadow-blue-500/50"
+                  : "bg-gray-200 text-gray-500 cursor-not-allowed"
+                }`}
             >
-              Mark Shipped
-            </button>
+              📦 Mark Shipped
+            </motion.button>
 
-            <button
+            <motion.button
+              whileHover={{ scale: canMarkOutForDelivery() ? 1.05 : 1 }}
+              whileTap={{ scale: canMarkOutForDelivery() ? 0.95 : 1 }}
               disabled={!canMarkOutForDelivery() || updating}
               onClick={() => updateStatus("OUT_FOR_DELIVERY")}
-              className={`px-4 py-2 rounded-md font-semibold ${canMarkOutForDelivery() ? "bg-amber-600 text-white hover:bg-amber-700" : "bg-gray-200 text-gray-500 cursor-not-allowed"}`}
+              className={`px-6 py-3 rounded-xl font-bold transition-all duration-300 ${canMarkOutForDelivery()
+                  ? "bg-gradient-to-r from-amber-600 to-amber-700 text-white hover:shadow-lg hover:shadow-amber-500/50"
+                  : "bg-gray-200 text-gray-500 cursor-not-allowed"
+                }`}
             >
-              Mark Out for Delivery
-            </button>
+              🚚 Mark Out for Delivery
+            </motion.button>
 
-            <button
+            <motion.button
+              whileHover={{ scale: canMarkDelivered() ? 1.05 : 1 }}
+              whileTap={{ scale: canMarkDelivered() ? 0.95 : 1 }}
               disabled={!canMarkDelivered() || updating}
               onClick={() => updateStatus("DELIVERED")}
-              className={`px-4 py-2 rounded-md font-semibold ${canMarkDelivered() ? "bg-green-600 text-white hover:bg-green-700" : "bg-gray-200 text-gray-500 cursor-not-allowed"}`}
+              className={`px-6 py-3 rounded-xl font-bold transition-all duration-300 ${canMarkDelivered()
+                  ? "bg-gradient-to-r from-green-600 to-green-700 text-white hover:shadow-lg hover:shadow-green-500/50"
+                  : "bg-gray-200 text-gray-500 cursor-not-allowed"
+                }`}
             >
-              Mark Delivered
-            </button>
+              ✅ Mark Delivered
+            </motion.button>
           </div>
-        </div>
+        </motion.div>
 
         {/* Timeline */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border">
-          <h3 className="text-lg font-semibold mb-3">Timeline</h3>
-          <ol className="relative border-l border-gray-200 ml-3">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-white/60"
+        >
+          <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+            <span className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center text-white">📋</span>
+            Order Timeline
+          </h3>
+          <ol className="relative border-l-2 border-gradient-to-b from-indigo-200 to-purple-200 ml-4">
             {timeline.map((t, idx) => {
               const isLast = idx === timeline.length - 1;
               return (
-                <li key={idx} className="mb-6 ml-6">
-                  <span className="absolute -left-6 flex h-3 w-3 items-center justify-center rounded-full bg-indigo-500" />
-                  <div>
-                    <div className="font-semibold text-gray-800">{t.status}</div>
-                    <div className="text-xs text-gray-500">{friendlyDate(t.time)}</div>
+                <motion.li
+                  key={idx}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: idx * 0.1 }}
+                  className="mb-8 ml-6 last:mb-0"
+                >
+                  <span className="absolute -left-[9px] flex h-4 w-4 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 ring-4 ring-white" />
+                  <div className="bg-gradient-to-br from-indigo-50 to-purple-50 p-4 rounded-xl border border-indigo-100">
+                    <div className="font-bold text-gray-900 mb-1">{t.status}</div>
+                    <div className="text-sm text-gray-600">{friendlyDate(t.time)}</div>
                   </div>
-                </li>
+                </motion.li>
               );
             })}
           </ol>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

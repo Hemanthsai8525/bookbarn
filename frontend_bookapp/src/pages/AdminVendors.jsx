@@ -61,34 +61,49 @@ export default function AdminVendors() {
 
     return (
         <Layout>
-            <div className="min-h-screen bg-[#F8F9FA] pb-12 font-sans text-gray-900">
+            <div className="min-h-screen bg-gradient-to-br from-gray-50 via-amber-50/20 to-gray-50 pb-12 font-sans text-gray-900">
 
                 {/* Header */}
-                <div className="bg-white shadow-sm border-b border-gray-200 pt-8 pb-6 px-4 sm:px-8">
-                    <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-                        <div>
-                            <h1 className="text-3xl font-serif font-bold text-gray-900 flex items-center gap-3">
-                                <Shield className="text-amber-600" size={32} />
+                <div className="bg-gradient-to-r from-amber-600 via-amber-700 to-orange-600 shadow-xl border-b border-amber-800/20 pt-8 pb-8 px-4 sm:px-8 relative overflow-hidden">
+                    {/* Decorative elements */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none"></div>
+                    <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl"></div>
+
+                    <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 relative z-10">
+                        <motion.div
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.5 }}
+                        >
+                            <h1 className="text-4xl font-serif font-bold text-white flex items-center gap-3 drop-shadow-lg">
+                                <Shield className="text-white drop-shadow-md" size={36} />
                                 Vendor Management
                             </h1>
-                            <p className="text-gray-500 mt-1">Review and manage vendor partnerships</p>
-                        </div>
+                            <p className="text-amber-100 mt-2 font-medium">Review and manage vendor partnerships</p>
+                        </motion.div>
 
                         {/* Status Filter Tabs */}
-                        <div className="flex bg-gray-100 p-1 rounded-xl">
+                        <motion.div
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.5, delay: 0.1 }}
+                            className="flex bg-white/20 backdrop-blur-sm p-1.5 rounded-xl border border-white/30 shadow-lg"
+                        >
                             {["ALL", "PENDING", "APPROVED", "REJECTED"].map(status => (
-                                <button
+                                <motion.button
                                     key={status}
                                     onClick={() => setFilter(status)}
-                                    className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${filter === status
-                                        ? "bg-white text-gray-900 shadow-sm"
-                                        : "text-gray-500 hover:text-gray-700"
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    className={`px-5 py-2.5 rounded-lg text-sm font-bold transition-all ${filter === status
+                                        ? "bg-white text-amber-700 shadow-md"
+                                        : "text-white/90 hover:text-white hover:bg-white/10"
                                         }`}
                                 >
                                     {status.charAt(0) + status.slice(1).toLowerCase()}
-                                </button>
+                                </motion.button>
                             ))}
-                        </div>
+                        </motion.div>
                     </div>
                 </div>
 
@@ -125,14 +140,19 @@ export default function AdminVendors() {
                     </AnimatePresence>
 
                     {/* Vendors Table */}
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.2 }}
+                        className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/60 overflow-hidden"
+                    >
                         <table className="w-full text-left">
-                            <thead className="bg-gray-50 border-b border-gray-100">
+                            <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b-2 border-gray-200">
                                 <tr>
-                                    <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Vendor</th>
-                                    <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Contact</th>
-                                    <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
-                                    <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">Actions</th>
+                                    <th className="px-6 py-4 text-xs font-black text-gray-600 uppercase tracking-wider">Vendor</th>
+                                    <th className="px-6 py-4 text-xs font-black text-gray-600 uppercase tracking-wider">Contact</th>
+                                    <th className="px-6 py-4 text-xs font-black text-gray-600 uppercase tracking-wider">Status</th>
+                                    <th className="px-6 py-4 text-xs font-black text-gray-600 uppercase tracking-wider text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
@@ -143,8 +163,14 @@ export default function AdminVendors() {
                                         </td>
                                     </tr>
                                 ) : (
-                                    filteredVendors.map((v) => (
-                                        <tr key={v.id} className="group hover:bg-gray-50/50 transition-colors">
+                                    filteredVendors.map((v, index) => (
+                                        <motion.tr
+                                            key={v.id}
+                                            initial={{ opacity: 0, x: -20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: index * 0.05 }}
+                                            className="group hover:bg-gradient-to-r hover:from-amber-50/50 hover:to-transparent transition-all duration-300"
+                                        >
                                             <td className="px-6 py-4">
                                                 <div className="font-bold text-gray-900">{v.name}</div>
                                                 <div className="text-xs text-gray-400">ID: #{v.id}</div>
@@ -154,11 +180,11 @@ export default function AdminVendors() {
                                                 <div className="text-sm text-gray-500">{v.phone}</div>
                                             </td>
                                             <td className="px-6 py-4">
-                                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${v.status === "APPROVED" ? "bg-emerald-50 text-emerald-700 border-emerald-100" :
-                                                    v.status === "REJECTED" ? "bg-red-50 text-red-700 border-red-100" :
-                                                        "bg-amber-50 text-amber-700 border-amber-100"
+                                                <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border shadow-sm ${v.status === "APPROVED" ? "bg-gradient-to-r from-emerald-50 to-green-50 text-emerald-700 border-emerald-200" :
+                                                    v.status === "REJECTED" ? "bg-gradient-to-r from-red-50 to-pink-50 text-red-700 border-red-200" :
+                                                        "bg-gradient-to-r from-amber-50 to-yellow-50 text-amber-700 border-amber-200"
                                                     }`}>
-                                                    <span className={`w-1.5 h-1.5 rounded-full ${v.status === "APPROVED" ? "bg-emerald-500" :
+                                                    <span className={`w-2 h-2 rounded-full animate-pulse ${v.status === "APPROVED" ? "bg-emerald-500" :
                                                         v.status === "REJECTED" ? "bg-red-500" :
                                                             "bg-amber-500"
                                                         }`}></span>
@@ -169,40 +195,50 @@ export default function AdminVendors() {
                                                 <div className="flex justify-end gap-2">
                                                     {v.status === "PENDING" && (
                                                         <>
-                                                            <button
+                                                            <motion.button
+                                                                whileHover={{ scale: 1.1 }}
+                                                                whileTap={{ scale: 0.9 }}
                                                                 onClick={() => handleAction(v.id, 'approve')}
-                                                                className="p-2 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:scale-105 transition-all"
+                                                                className="p-2.5 rounded-xl bg-gradient-to-br from-emerald-50 to-green-50 text-emerald-600 hover:from-emerald-100 hover:to-green-100 transition-all shadow-sm hover:shadow-md"
                                                                 title="Approve"
                                                             >
                                                                 <Check size={18} strokeWidth={2.5} />
-                                                            </button>
-                                                            <button
+                                                            </motion.button>
+                                                            <motion.button
+                                                                whileHover={{ scale: 1.1 }}
+                                                                whileTap={{ scale: 0.9 }}
                                                                 onClick={() => handleAction(v.id, 'reject')}
-                                                                className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 hover:scale-105 transition-all"
+                                                                className="p-2.5 rounded-xl bg-gradient-to-br from-red-50 to-pink-50 text-red-600 hover:from-red-100 hover:to-pink-100 transition-all shadow-sm hover:shadow-md"
                                                                 title="Reject"
                                                             >
                                                                 <X size={18} strokeWidth={2.5} />
-                                                            </button>
+                                                            </motion.button>
                                                         </>
                                                     )}
                                                     {v.status === "REJECTED" && (
-                                                        <button
+                                                        <motion.button
+                                                            whileHover={{ scale: 1.05 }}
+                                                            whileTap={{ scale: 0.95 }}
                                                             onClick={() => handleAction(v.id, 'approve')}
-                                                            className="p-2 rounded-lg bg-gray-50 text-gray-600 hover:bg-emerald-50 hover:text-emerald-600 transition-all flex items-center gap-1 text-sm font-bold"
+                                                            className="px-3 py-2 rounded-xl bg-gray-50 text-gray-600 hover:bg-emerald-50 hover:text-emerald-600 transition-all flex items-center gap-1.5 text-sm font-bold shadow-sm"
                                                         >
                                                             <RefreshCw size={14} /> Re-evaluate
-                                                        </button>
+                                                        </motion.button>
                                                     )}
                                                     {v.status === "APPROVED" && (
-                                                        <button
+                                                        <motion.button
+                                                            whileHover={{ scale: 1.1 }}
+                                                            whileTap={{ scale: 0.9 }}
                                                             onClick={() => handleAction(v.id, 'reject')}
-                                                            className="p-2 rounded-lg bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-600 transition-all"
+                                                            className="p-2.5 rounded-xl bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-600 transition-all shadow-sm"
                                                             title="Revoke Access"
                                                         >
                                                             <Shield size={18} />
-                                                        </button>
+                                                        </motion.button>
                                                     )}
-                                                    <button
+                                                    <motion.button
+                                                        whileHover={{ scale: 1.1 }}
+                                                        whileTap={{ scale: 0.9 }}
                                                         onClick={async () => {
                                                             if (window.confirm("Are you sure you want to delete this vendor?")) {
                                                                 try {
@@ -216,19 +252,19 @@ export default function AdminVendors() {
                                                                 }
                                                             }
                                                         }}
-                                                        className="p-2 rounded-lg text-gray-400 hover:bg-red-50 hover:text-red-600 transition-all ml-2"
+                                                        className="p-2.5 rounded-xl text-gray-400 hover:bg-red-50 hover:text-red-600 transition-all shadow-sm"
                                                         title="Delete Vendor"
                                                     >
                                                         <X size={18} />
-                                                    </button>
+                                                    </motion.button>
                                                 </div>
                                             </td>
-                                        </tr>
+                                        </motion.tr>
                                     ))
                                 )}
                             </tbody>
                         </table>
-                    </div>
+                    </motion.div>
 
                 </div>
             </div>
