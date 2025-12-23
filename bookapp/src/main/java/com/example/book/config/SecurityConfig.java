@@ -43,7 +43,9 @@ public class SecurityConfig {
 						"/delivery/login", "/delivery/register", "/delivery/refresh", "/delivery/forgot-password",
 						"/delivery/reset-password",
 						"/vendors/register", "/vendors/login", "/vendors/forgot-password", "/vendors/reset-password",
-						"/otp/**")
+						"/otp/**",
+						"/ws/**",
+						"/error")
 				.permitAll()
 				.requestMatchers(HttpMethod.GET, "/books").permitAll()
 				.requestMatchers(HttpMethod.GET, "/uploads/**").permitAll()

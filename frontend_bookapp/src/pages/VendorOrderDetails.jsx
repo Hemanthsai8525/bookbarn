@@ -159,7 +159,7 @@ export default function VendorOrderDetails() {
                                                         src={item.book.image.startsWith('http') ? item.book.image : `${import.meta.env.VITE_API_BASE || 'https://bookapp-production-3e11.up.railway.app'}${item.book.image}`}
                                                         alt={item.book?.title}
                                                         className="w-full h-full object-cover"
-                                                        onError={(e) => { e.target.src = 'https://via.placeholder.com/100x150?text=Book'; }}
+                                                        onError={(e) => { e.target.src = 'https://placehold.co/100x150?text=Book'; }}
                                                     />
                                                 ) : (
                                                     <div className="w-full h-full flex items-center justify-center text-gray-400">

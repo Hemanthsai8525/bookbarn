@@ -491,14 +491,14 @@ export default function VendorDashboard() {
                                                 <img
                                                     src={
                                                         !b.image || (!b.image.startsWith('http') && !b.image.startsWith('/'))
-                                                            ? "https://via.placeholder.com/300x450?text=No+Cover"
+                                                            ? "https://placehold.co/300x450?text=No+Cover"
                                                             : b.image.startsWith('http')
                                                                 ? b.image
                                                                 : `${import.meta.env.VITE_API_BASE || "https://bookapp-production-3e11.up.railway.app"}${b.image}`
                                                     }
                                                     alt={b.title}
                                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                                    onError={(e) => { e.target.onerror = null; e.target.src = "https://via.placeholder.com/300x450?text=No+Cover"; }}
+                                                    onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/300x450?text=No+Cover"; }}
                                                 />
                                             ) : (
                                                 <div className="flex items-center justify-center h-full text-gray-400">

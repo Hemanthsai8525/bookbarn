@@ -168,7 +168,7 @@ export default function OrderDetails() {
                           src={item.book?.image?.startsWith('http') ? item.book.image : `${import.meta.env.VITE_API_BASE || "https://bookapp-production-3e11.up.railway.app"}${item.book.image}`}
                           className="w-full h-full object-cover"
                           alt=""
-                          onError={(e) => { e.target.onerror = null; e.target.src = "https://via.placeholder.com/150x200?text=No+Preview"; }}
+                          onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/150x200?text=No+Preview"; }}
                         />
                       </div>
                       <div className="flex-1">

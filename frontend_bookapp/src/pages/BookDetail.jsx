@@ -101,7 +101,7 @@ export default function BookDetail() {
                 transition={{ duration: 0.5 }}
                 src={
                   !book.image || (!book.image.startsWith("http") && !book.image.startsWith("/"))
-                    ? "https://via.placeholder.com/400x600?text=No+Cover"
+                    ? "https://placehold.co/400x600?text=No+Cover"
                     : book.image.startsWith("http")
                       ? book.image
                       : `${import.meta.env.VITE_API_BASE || "https://bookapp-production-3e11.up.railway.app"}${book.image}`
@@ -110,7 +110,7 @@ export default function BookDetail() {
                 className="relative w-3/5 shadow-2xl rounded-r-lg transform group-hover:scale-105 transition-transform duration-500"
                 onError={(e) => {
                   e.target.onerror = null;
-                  e.target.src = "https://via.placeholder.com/400x600?text=No+Cover";
+                  e.target.src = "https://placehold.co/400x600?text=No+Cover";
                 }}
               />
             </div>

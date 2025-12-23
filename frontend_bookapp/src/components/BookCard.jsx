@@ -24,7 +24,7 @@ export default function BookCard({ book, onAdd }) {
         <img
           src={
             !book.image || (!book.image.startsWith("http") && !book.image.startsWith("/"))
-              ? "https://via.placeholder.com/300x450?text=No+Cover"
+              ? "https://placehold.co/300x450?text=No+Cover"
               : book.image.startsWith("http")
                 ? book.image
                 : `${import.meta.env.VITE_API_BASE || "https://bookapp-production-3e11.up.railway.app"}${book.image}`
@@ -35,7 +35,7 @@ export default function BookCard({ book, onAdd }) {
           loading="lazy"
           onError={(e) => {
             e.target.onerror = null;
-            e.target.src = "https://via.placeholder.com/300x450?text=No+Cover";
+            e.target.src = "https://placehold.co/300x450?text=No+Cover";
           }}
         />
 

@@ -48,7 +48,7 @@ export default function FeaturedCarousel({ items = [] }) {
                 }
                 alt={b.title}
                 className="w-full h-full object-cover"
-                onError={(e) => { e.target.onerror = null; e.target.src = "https://via.placeholder.com/300x200?text=Cover+Missing"; }}
+                onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/300x200?text=Cover+Missing"; }}
               />
 
             </div>
