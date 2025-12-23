@@ -2,7 +2,7 @@
 import api from "../services/api";
 import wsClient from "../services/websocket";
 import { useNavigate } from "react-router-dom";
-import { BookOpen, LogOut, Package, Plus, Search, DollarSign, Image as ImageIcon, X, TrendingUp, Edit2, Trash2, ShoppingBag, CheckCircle, RefreshCw, Bell } from "lucide-react";
+import { BookOpen, LogOut, Package, Plus, Search, DollarSign, Image as ImageIcon, X, TrendingUp, Edit2, Trash2, ShoppingBag, CheckCircle, RefreshCw, Bell, Eye } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function VendorDashboard() {
@@ -27,11 +27,34 @@ export default function VendorDashboard() {
     const [wsConnected, setWsConnected] = useState(false);
 
     // Initialize WebSocket connection
+    const pollingRef = React.useRef(null);
+
+    // Initialize WebSocket connection
     useEffect(() => {
         if (!token) {
             navigate("/login");
             return;
         }
+
+        const startPolling = () => {
+            if (pollingRef.current) return;
+            console.log('📡 Starting polling mode (30s interval)');
+
+            // Poll every 30 seconds
+            pollingRef.current = setInterval(() => {
+                fetchOrders();
+                fetchNotifications();
+                fetchMyBooks(true); // Silent update
+            }, 30000);
+        };
+
+        const stopPolling = () => {
+            if (pollingRef.current) {
+                clearInterval(pollingRef.current);
+                pollingRef.current = null;
+                console.log('🛑 Stopped polling mode');
+            }
+        };
 
         // Get vendor profile to get vendor ID
         const initializeVendor = async () => {
@@ -40,11 +63,17 @@ export default function VendorDashboard() {
                 const vId = profileRes.data.id;
                 setVendorId(vId);
 
+                // Initial fetch
+                fetchOrders();
+                fetchNotifications();
+                fetchMyBooks();
+
                 // Connect to WebSocket
                 wsClient.connect(
                     () => {
                         console.log('WebSocket connected for vendor:', vId);
                         setWsConnected(true);
+                        stopPolling(); // Stop polling if connected
 
                         // Subscribe to vendor-specific topics
                         wsClient.subscribe(`/topic/vendor/${vId}`, handleWebSocketMessage);
@@ -52,10 +81,12 @@ export default function VendorDashboard() {
                     (error) => {
                         console.error('WebSocket connection error:', error);
                         setWsConnected(false);
+                        startPolling(); // Fallback to polling
                     }
                 );
             } catch (err) {
                 console.error("Failed to initialize vendor", err);
+                startPolling(); // Fallback on error
             }
         };
 
@@ -64,6 +95,7 @@ export default function VendorDashboard() {
         // Cleanup on unmount
         return () => {
             wsClient.disconnect();
+            stopPolling();
         };
     }, [token, navigate]);
 
@@ -120,20 +152,16 @@ export default function VendorDashboard() {
         }
     };
 
-    useEffect(() => {
-        if (!token) {
-            navigate("/login");
-            return;
-        }
-        fetchMyBooks();
-        fetchNotifications();
-        fetchOrders(); // Initial fetch
-    }, [token]);
+
 
     const fetchNotifications = async () => {
         try {
-            const profileRes = await api.get("/vendor/profile");
-            const vId = profileRes.data.id;
+            let vId = vendorId;
+            if (!vId) {
+                const profileRes = await api.get("/vendor/profile");
+                vId = profileRes.data.id;
+                setVendorId(vId);
+            }
 
             const res = await api.get(`/notifications/vendor/${vId}`);
             setNotifications(res.data);
@@ -153,8 +181,12 @@ export default function VendorDashboard() {
 
     const fetchOrders = async () => {
         try {
-            const profileRes = await api.get("/vendor/profile");
-            const vId = profileRes.data.id;
+            let vId = vendorId;
+            if (!vId) {
+                const profileRes = await api.get("/vendor/profile");
+                vId = profileRes.data.id;
+                setVendorId(vId);
+            }
 
             const res = await api.get(`/orders/vendor/${vId}`);
             setOrders(res.data);
@@ -175,15 +207,15 @@ export default function VendorDashboard() {
         }
     };
 
-    const fetchMyBooks = async () => {
-        setLoading(true);
+    const fetchMyBooks = async (silent = false) => {
+        if (!silent) setLoading(true);
         try {
             const res = await api.get("/vendor/my-books");
             setBooks(res.data);
         } catch (err) {
             console.error("Failed to fetch books", err);
         } finally {
-            setLoading(false);
+            if (!silent) setLoading(false);
         }
     }
 
@@ -273,8 +305,8 @@ export default function VendorDashboard() {
                 {/* WebSocket Connection Status */}
                 <div className="mb-6 flex justify-end">
                     <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition-all ${wsConnected
-                            ? 'bg-green-50 text-green-700 border border-green-200'
-                            : 'bg-amber-50 text-amber-700 border border-amber-200'
+                        ? 'bg-green-50 text-green-700 border border-green-200'
+                        : 'bg-amber-50 text-amber-700 border border-amber-200'
                         }`}>
                         <div className={`w-2 h-2 rounded-full ${wsConnected ? 'bg-green-500 animate-pulse' : 'bg-amber-500 animate-pulse'}`}></div>
                         {wsConnected ? '🟢 Live Updates Active' : '� Polling Mode (30s)'}
@@ -531,6 +563,15 @@ export default function VendorDashboard() {
 
                                             <div className="flex flex-col justify-center items-end gap-3">
                                                 <p className="text-xl font-bold text-gray-900">₹{o.total}</p>
+
+                                                {/* View Details Button */}
+                                                <button
+                                                    onClick={() => navigate(`/vendor/orders/${o.id}`)}
+                                                    className="w-full md:w-auto bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2"
+                                                >
+                                                    <Eye size={16} /> View Details
+                                                </button>
+
                                                 {o.status === 'PENDING' && (
                                                     <button
                                                         onClick={() => handleAcceptOrder(o.id)}

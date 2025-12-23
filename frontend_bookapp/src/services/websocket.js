@@ -15,13 +15,17 @@ class WebSocketClient {
         const API_BASE = import.meta.env.VITE_API_BASE || 'https://bookapp-production-3e11.up.railway.app';
         const WS_URL = `${API_BASE}/ws`;
 
+        // Create client configuration
         this.client = new Client({
             webSocketFactory: () => new SockJS(WS_URL),
-            reconnectDelay: this.reconnectDelay,
+            reconnectDelay: 0, // Disable automatic reconnection to handle it manually
             heartbeatIncoming: 4000,
             heartbeatOutgoing: 4000,
             debug: (str) => {
-                console.log('[WebSocket]', str);
+                // Only log non-heartbeat debug info to reduce noise
+                if (str !== '>>> PING' && str !== '<<< PONG') {
+                    // console.log('[WebSocket]', str); 
+                }
             },
             onConnect: () => {
                 console.log('✅ WebSocket Connected');
@@ -30,30 +34,47 @@ class WebSocketClient {
                 if (onConnected) onConnected();
             },
             onStompError: (frame) => {
-                console.error('❌ WebSocket Error:', frame.headers['message']);
-                console.error('Details:', frame.body);
+                console.error('❌ WebSocket Stomp Error:', frame.headers['message']);
                 this.connected = false;
                 if (onError) onError(frame);
             },
-            onWebSocketClose: () => {
+            onWebSocketClose: (evt) => {
                 console.log('🔌 WebSocket Disconnected');
                 this.connected = false;
+
+                // If the connection was closed cleanly or due to 403, we might want to stop
+                // SockJS close event doesn't always expose status code easily in all browsers
+                // but if we are here, we try to reconnect unless max attempts reached
                 this.handleReconnect(onConnected, onError);
             },
         });
 
-        this.client.activate();
+        try {
+            this.client.activate();
+        } catch (e) {
+            console.error("WebSocket activation error:", e);
+            if (onError) onError(e);
+        }
     }
 
     handleReconnect(onConnected, onError) {
         if (this.reconnectAttempts < this.maxReconnectAttempts) {
             this.reconnectAttempts++;
             console.log(`🔄 Attempting to reconnect... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+
+            // Exponential backoff
+            const delay = this.reconnectDelay * Math.pow(1.5, this.reconnectAttempts - 1);
+
             setTimeout(() => {
-                this.connect(onConnected, onError);
-            }, this.reconnectDelay * this.reconnectAttempts);
+                // Ensure we don't try to connect if we've been told to disconnect
+                if (this.client && !this.client.active) {
+                    this.connect(onConnected, onError);
+                }
+            }, delay);
         } else {
-            console.error('❌ Max reconnection attempts reached');
+            console.error('❌ Max reconnection attempts reached - Stopping WebSocket');
+            // Notify the caller that connection failed permanently so they can fallback to polling
+            if (onError) onError(new Error("Max reconnection attempts reached"));
         }
     }
 

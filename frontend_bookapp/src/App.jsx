@@ -40,6 +40,7 @@ import VendorLogin from "./pages/VendorLogin";
 import VendorDashboard from "./pages/VendorDashboard";
 import VendorProfile from "./pages/VendorProfile";
 import VendorProfileEdit from "./pages/VendorProfileEdit";
+import VendorOrderDetails from "./pages/VendorOrderDetails";
 import AdminVendors from "./pages/AdminVendors";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
@@ -196,6 +197,7 @@ export default function App() {
           {/* VENDOR ROUTES */}
           <Route path="/vendors/register" element={<VendorRegister />} />
           <Route path="/vendor/dashboard" element={<VendorRoute><VendorDashboard /></VendorRoute>} />
+          <Route path="/vendor/orders/:orderId" element={<VendorRoute><VendorOrderDetails /></VendorRoute>} />
           <Route path="/vendor/profile" element={<VendorRoute><VendorProfile /></VendorRoute>} />
           <Route path="/vendor/update-profile" element={<VendorRoute><VendorProfileEdit /></VendorRoute>} />
           <Route path="/admin/vendors" element={<AdminRoute><AdminVendors /></AdminRoute>} />
