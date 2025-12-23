@@ -19,7 +19,8 @@ public class OrderHistory {
 	private Long id;
 
 	private String status;
-	private LocalDateTime time = LocalDateTime.now();
+	@com.fasterxml.jackson.annotation.JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	private LocalDateTime timestamp = LocalDateTime.now();
 
 	@ManyToOne
 	@JsonBackReference
@@ -33,7 +34,7 @@ public class OrderHistory {
 		this.status = status;
 		this.order = order;
 	}
-	
+
 	public Long getId() {
 		return id;
 	}
@@ -50,12 +51,12 @@ public class OrderHistory {
 		this.status = status;
 	}
 
-	public LocalDateTime getTime() {
-		return time;
+	public LocalDateTime getTimestamp() {
+		return timestamp;
 	}
 
-	public void setTime(LocalDateTime time) {
-		this.time = time;
+	public void setTimestamp(LocalDateTime timestamp) {
+		this.timestamp = timestamp;
 	}
 
 	public Order getOrder() {

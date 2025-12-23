@@ -66,9 +66,7 @@ public class OrderService {
 		// 2. Group Items by Vendor
 		Map<Long, List<CartItem>> itemsByVendor = new HashMap<>();
 		for (CartItem ci : items) {
-			Long vId = (ci.getBook().getVendor() != null) ? ci.getBook().getVendor().getId() : 0L; // 0L for
-																									// Admin/Platform
-																									// items
+			Long vId = (ci.getBook().getVendor() != null) ? ci.getBook().getVendor().getId() : 0L;
 			itemsByVendor.computeIfAbsent(vId, k -> new ArrayList<>()).add(ci);
 		}
 
