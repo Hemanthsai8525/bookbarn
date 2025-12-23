@@ -99,6 +99,7 @@ export default function BookDetail() {
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.5 }}
+                referrerPolicy="no-referrer"
                 src={
                   !book.image || (!book.image.startsWith("http") && !book.image.startsWith("/"))
                     ? "https://placehold.co/400x600?text=No+Cover"

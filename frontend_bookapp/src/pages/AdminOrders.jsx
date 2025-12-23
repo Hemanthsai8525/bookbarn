@@ -126,7 +126,7 @@ export default function AdminOrders() {
                         </div>
                         <span className="font-semibold text-gray-700">{order.userName || order.userId}</span>
                       </div>
-                      <p className="text-xs text-gray-400 mt-1 pl-8">{new Date(order.createdAt || Date.now()).toLocaleDateString()}</p>
+                      <p className="text-xs text-gray-400 mt-1 pl-8">{new Date((order.createdAt || "").replace(" ", "T") || Date.now()).toLocaleDateString()}</p>
                     </div>
                     <div>
                       <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Amount</p>

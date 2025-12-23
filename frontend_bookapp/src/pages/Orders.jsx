@@ -92,7 +92,7 @@ export default function Orders() {
                           </span>
                         </div>
                         <p className="text-sm text-gray-500 flex items-center gap-2">
-                          <Clock size={14} /> {new Date(order.createdAt || Date.now()).toLocaleDateString()}
+                          <Clock size={14} /> {new Date((order.createdAt || "").replace(" ", "T") || Date.now()).toLocaleDateString()}
                         </p>
                       </div>
                       <div className="text-right">
