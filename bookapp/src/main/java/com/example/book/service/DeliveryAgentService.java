@@ -28,8 +28,7 @@ public class DeliveryAgentService {
             DeliveryAgentRepository agentRepo,
             OrderRepository orderRepo,
             PasswordEncoder encoder,
-            JwtService jwt
-    ) {
+            JwtService jwt) {
         this.agentRepo = agentRepo;
         this.orderRepo = orderRepo;
         this.encoder = encoder;
@@ -80,7 +79,7 @@ public class DeliveryAgentService {
 
         Order order = orderRepo.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
-        
+
         if (!"CONFIRMED".equals(order.getStatus())) {
             throw new RuntimeException("Only CONFIRMED orders can be taken");
         }
@@ -90,28 +89,25 @@ public class DeliveryAgentService {
 
         order.setAssignedAgent(agent);
         order.setStatus("SHIPPED");
-        
+
         OrderHistory h = new OrderHistory();
         h.setStatus("SHIPPED");
-        h.setTime(LocalDateTime.now());
+        h.setTimestamp(LocalDateTime.now());
         h.setOrder(order);
-        
-        order.getHistory().add(h);
 
-        
+        order.getHistory().add(h);
 
         return orderRepo.save(order);
     }
-    
-    public List<DeliveryAgent> findAll(){
-    	return agentRepo.findAll();
+
+    public List<DeliveryAgent> findAll() {
+        return agentRepo.findAll();
     }
-    
+
     public void delete(Long id) {
-    	agentRepo.deleteById(id);
+        agentRepo.deleteById(id);
     }
-    
-    
+
     public DeliveryAgent getById(Long id) {
         return agentRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Agent not found"));
@@ -126,11 +122,11 @@ public class DeliveryAgentService {
         agent.setArea(updated.getArea());
         agent.setEmail(updated.getEmail());
         // password update only if you want
-        // if(updated.getPassword() != null) agent.setPassword(passwordEncoder.encode(updated.getPassword()));
+        // if(updated.getPassword() != null)
+        // agent.setPassword(passwordEncoder.encode(updated.getPassword()));
 
         return agentRepo.save(agent);
     }
-
 
     // ---------------- UPDATE STATUS: SHIPPED / DELIVERED ----------------
     public Order updateStatus(Long orderId, String status) {
@@ -139,12 +135,12 @@ public class DeliveryAgentService {
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
         order.setStatus(status);
-        
+
         OrderHistory h = new OrderHistory();
         h.setStatus(status);
-        h.setTime( LocalDateTime.now());
+        h.setTimestamp(LocalDateTime.now());
         h.setOrder(order);
-        
+
         order.getHistory().add(h);
         return orderRepo.save(order);
     }
