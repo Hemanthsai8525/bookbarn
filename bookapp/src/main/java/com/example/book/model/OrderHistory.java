@@ -33,6 +33,7 @@ public class OrderHistory {
 	public OrderHistory(String status, Order order) {
 		this.status = status;
 		this.order = order;
+		this.timestamp = LocalDateTime.now(); // Explicitly set timestamp
 	}
 
 	public Long getId() {
