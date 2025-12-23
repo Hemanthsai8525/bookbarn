@@ -274,10 +274,10 @@ export default function VendorDashboard() {
                 <div className="mb-6 flex justify-end">
                     <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition-all ${wsConnected
                             ? 'bg-green-50 text-green-700 border border-green-200'
-                            : 'bg-red-50 text-red-700 border border-red-200'
+                            : 'bg-amber-50 text-amber-700 border border-amber-200'
                         }`}>
-                        <div className={`w-2 h-2 rounded-full ${wsConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
-                        {wsConnected ? '🟢 Live Updates Active' : '🔴 Connecting...'}
+                        <div className={`w-2 h-2 rounded-full ${wsConnected ? 'bg-green-500 animate-pulse' : 'bg-amber-500 animate-pulse'}`}></div>
+                        {wsConnected ? '🟢 Live Updates Active' : '� Polling Mode (30s)'}
                     </div>
                 </div>
 
