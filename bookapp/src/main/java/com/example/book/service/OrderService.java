@@ -105,10 +105,10 @@ public class OrderService {
 		return createdOrders.stream().map(this::enrichOrder).collect(Collectors.toList());
 	}
 
-	// ------------------ ADMIN CONFIRM ORDER ------------------
 	@jakarta.transaction.Transactional
 	public Order adminConfirmOrder(Long orderId) {
 		Order order = repo.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+		enrichOrder(order); // Populate transient Book objects
 
 		if (!"NEW".equals(order.getStatus())) {
 			throw new RuntimeException("Order is not in NEW status");
