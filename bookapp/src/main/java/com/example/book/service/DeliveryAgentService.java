@@ -1,6 +1,6 @@
 package com.example.book.service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,7 +92,7 @@ public class DeliveryAgentService {
 
         OrderHistory h = new OrderHistory();
         h.setStatus("SHIPPED");
-        h.setTimestamp(LocalDateTime.now());
+        h.setTimestamp(Instant.now());
         h.setOrder(order);
 
         order.getHistory().add(h);
@@ -138,7 +138,7 @@ public class DeliveryAgentService {
 
         OrderHistory h = new OrderHistory();
         h.setStatus(status);
-        h.setTimestamp(LocalDateTime.now());
+        h.setTimestamp(Instant.now());
         h.setOrder(order);
 
         order.getHistory().add(h);

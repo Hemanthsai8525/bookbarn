@@ -1,5 +1,6 @@
 package com.example.book.model;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,8 +32,7 @@ public class Order {
 	private String status; // PENDING, CONFIRMED, SHIPPED, PICKED_UP, DELIVERED, CANCELLED
 	private String paymentMethod; // CARD, COD
 
-	@com.fasterxml.jackson.annotation.JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	private java.time.LocalDateTime createdAt = java.time.LocalDateTime.now();
+	private Instant createdAt = Instant.now();
 
 	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
 	@JsonManagedReference
@@ -130,11 +130,11 @@ public class Order {
 		this.items = items;
 	}
 
-	public java.time.LocalDateTime getCreatedAt() {
+	public Instant getCreatedAt() {
 		return createdAt;
 	}
 
-	public void setCreatedAt(java.time.LocalDateTime createdAt) {
+	public void setCreatedAt(Instant createdAt) {
 		this.createdAt = createdAt;
 	}
 

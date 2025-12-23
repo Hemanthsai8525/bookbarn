@@ -1,8 +1,6 @@
 package com.example.book.model;
 
-import java.time.LocalDateTime;
-import com.fasterxml.jackson.annotation.JsonFormat;
-
+import java.time.Instant;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Entity;
@@ -22,8 +20,7 @@ public class Notification {
     private Long id;
 
     private String message;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime timestamp;
+    private Instant timestamp;
 
     @JsonProperty("isRead")
     private boolean isRead = false;
@@ -33,13 +30,13 @@ public class Notification {
     private Vendor vendor;
 
     public Notification() {
-        this.timestamp = LocalDateTime.now();
+        this.timestamp = Instant.now();
     }
 
     public Notification(String message, Vendor vendor) {
         this.message = message;
         this.vendor = vendor;
-        this.timestamp = LocalDateTime.now();
+        this.timestamp = Instant.now();
     }
 
     public Long getId() {
@@ -58,11 +55,11 @@ public class Notification {
         this.message = message;
     }
 
-    public LocalDateTime getTimestamp() {
+    public Instant getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(LocalDateTime timestamp) {
+    public void setTimestamp(Instant timestamp) {
         this.timestamp = timestamp;
     }
 

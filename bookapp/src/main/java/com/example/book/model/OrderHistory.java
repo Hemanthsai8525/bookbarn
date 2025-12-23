@@ -1,6 +1,6 @@
 package com.example.book.model;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
@@ -19,8 +19,7 @@ public class OrderHistory {
 	private Long id;
 
 	private String status;
-	@com.fasterxml.jackson.annotation.JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	private LocalDateTime timestamp = LocalDateTime.now();
+	private Instant timestamp = Instant.now();
 
 	@ManyToOne
 	@JsonBackReference
@@ -33,7 +32,7 @@ public class OrderHistory {
 	public OrderHistory(String status, Order order) {
 		this.status = status;
 		this.order = order;
-		this.timestamp = LocalDateTime.now(); // Explicitly set timestamp
+		this.timestamp = Instant.now(); // Explicitly set timestamp
 	}
 
 	public Long getId() {
@@ -52,11 +51,11 @@ public class OrderHistory {
 		this.status = status;
 	}
 
-	public LocalDateTime getTimestamp() {
+	public Instant getTimestamp() {
 		return timestamp;
 	}
 
-	public void setTimestamp(LocalDateTime timestamp) {
+	public void setTimestamp(Instant timestamp) {
 		this.timestamp = timestamp;
 	}
 
