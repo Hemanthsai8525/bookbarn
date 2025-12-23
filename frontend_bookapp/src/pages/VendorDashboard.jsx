@@ -2,7 +2,7 @@
 import api from "../services/api";
 import wsClient from "../services/websocket";
 import { useNavigate } from "react-router-dom";
-import { BookOpen, LogOut, Package, Plus, Search, DollarSign, Image as ImageIcon, X, TrendingUp, Edit2, Trash2, ShoppingBag, CheckCircle, RefreshCw, Bell, Eye } from "lucide-react";
+import { BookOpen, LogOut, Package, Plus, Search, DollarSign, Image as ImageIcon, X, TrendingUp, Edit2, Trash2, ShoppingBag, CheckCircle, RefreshCw, Bell, Eye, Clock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function VendorDashboard() {
@@ -25,6 +25,25 @@ export default function VendorDashboard() {
     const [activeTab, setActiveTab] = useState("inventory"); // inventory | orders
     const [vendorId, setVendorId] = useState(null);
     const [wsConnected, setWsConnected] = useState(false);
+    const [currentTime, setCurrentTime] = useState(Date.now());
+
+    // Update timer every minute
+    useEffect(() => {
+        const timer = setInterval(() => setCurrentTime(Date.now()), 60000);
+        return () => clearInterval(timer);
+    }, []);
+
+    const getTimeAgo = (date) => {
+        if (!date) return '';
+        const d = new Date(date);
+        const seconds = Math.floor((currentTime - d) / 1000);
+        if (seconds < 60) return 'Just now';
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60) return `${minutes}m ago`;
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return `${hours}h ago`;
+        return d.toLocaleDateString();
+    };
 
     // Initialize WebSocket connection
     const pollingRef = React.useRef(null);
@@ -371,14 +390,14 @@ export default function VendorDashboard() {
                         </button>
                     </div>
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                        {notifications.filter(n => !n.isRead).length === 0 ? (
+                        {notifications.filter(n => !(n.isRead || n.read)).length === 0 ? (
                             <div className="p-12 text-center text-gray-500 flex flex-col items-center">
                                 <Bell size={40} className="text-gray-200 mb-3" />
                                 <p className="font-medium">No new alerts</p>
                             </div>
                         ) : (
                             <div className="divide-y divide-gray-100 max-h-80 overflow-y-auto">
-                                {notifications.filter(n => !n.isRead).map((n) => (
+                                {notifications.filter(n => !(n.isRead || n.read)).map((n) => (
                                     <div
                                         key={n.id}
                                         onClick={() => markNotificationRead(n.id)}
@@ -541,6 +560,9 @@ export default function VendorDashboard() {
                                             <div className="space-y-2">
                                                 <div className="flex items-center gap-3">
                                                     <span className="text-lg font-bold text-gray-900">Order #{o.id}</span>
+                                                    <span className="text-sm font-medium text-gray-400 flex items-center gap-1">
+                                                        •  <Clock size={14} /> {getTimeAgo(o.createdAt || o.timestamp || (o.history && o.history[0]?.timestamp))}
+                                                    </span>
                                                     <span className={`px-3 py-1 rounded-full text-xs font-bold ${o.status === 'PENDING' ? 'bg-amber-100 text-amber-700' :
                                                         o.status === 'READY_FOR_DELIVERY' ? 'bg-blue-100 text-blue-700' :
                                                             o.status === 'SHIPPED' ? 'bg-purple-100 text-purple-700' :

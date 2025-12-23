@@ -3,6 +3,8 @@ package com.example.book.model;
 import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,6 +24,8 @@ public class Notification {
     private String message;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime timestamp;
+
+    @JsonProperty("isRead")
     private boolean isRead = false;
 
     @ManyToOne

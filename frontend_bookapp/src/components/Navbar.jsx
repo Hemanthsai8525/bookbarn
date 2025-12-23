@@ -253,7 +253,7 @@ export default function Navbar() {
                       className="relative p-2 rounded-full hover:bg-amber-50 transition-colors"
                     >
                       <Bell size={22} className="text-gray-700 hover:text-amber-700" />
-                      {notifications.some(n => !n.isRead) && (
+                      {notifications.some(n => !(n.isRead || n.read)) && (
                         <span className="absolute top-1 right-1 w-3 h-3 bg-red-500 border-2 border-white rounded-full"></span>
                       )}
                     </motion.button>
@@ -268,7 +268,7 @@ export default function Navbar() {
                         >
                           <div className="px-4 py-3 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
                             <h4 className="font-bold text-gray-900">Notifications</h4>
-                            {notifications.some(n => !n.isRead) && (
+                            {notifications.some(n => !(n.isRead || n.read)) && (
                               <button
                                 onClick={markAllRead}
                                 className="text-[10px] font-black uppercase tracking-widest text-amber-700 hover:text-amber-800"
@@ -278,13 +278,13 @@ export default function Navbar() {
                             )}
                           </div>
                           <div className="max-h-[350px] overflow-y-auto">
-                            {notifications.filter(n => !n.isRead).length === 0 ? (
+                            {notifications.filter(n => !(n.isRead || n.read)).length === 0 ? (
                               <div className="p-8 text-center">
                                 <Bell size={32} className="mx-auto text-gray-200 mb-3" />
                                 <p className="text-sm text-gray-400 font-medium">No system alerts</p>
                               </div>
                             ) : (
-                              notifications.filter(n => !n.isRead).map((n) => (
+                              notifications.filter(n => !(n.isRead || n.read)).map((n) => (
                                 <div
                                   key={n.id}
                                   onClick={() => markRead(n.id)}
