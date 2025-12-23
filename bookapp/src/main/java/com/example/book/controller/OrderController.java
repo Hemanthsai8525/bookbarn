@@ -85,4 +85,9 @@ public class OrderController {
         return "Updated";
     }
 
+    @PostMapping("/{id}/confirm")
+    public Order confirmOrder(@PathVariable Long id) {
+        return svc.adminConfirmOrder(id);
+    }
+
 }

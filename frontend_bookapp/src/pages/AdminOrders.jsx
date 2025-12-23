@@ -22,10 +22,10 @@ export default function AdminOrders() {
     if (!window.confirm(`Update order #${id} status to ${newStatus}?`)) return;
     try {
       if (newStatus === "CONFIRMED") {
-        await api.put(`/admin/orders/${id}/confirm`);
+        await api.post(`/orders/${id}/confirm`); // Updated Endpoint to POST /orders/...
       }
       loadOrders();
-    } catch (e) { alert("Failed to update status"); }
+    } catch (e) { console.error(e); alert("Failed to update status"); }
   }
 
   async function deleteOrder(id) {
@@ -36,6 +36,7 @@ export default function AdminOrders() {
   const filtered = filter === "ALL" ? orders : orders.filter(o => o.status === filter);
 
   const STATUS_COLORS = {
+    NEW: "bg-red-100 text-red-800 border-red-200 animate-pulse",
     PENDING: "bg-yellow-100 text-yellow-800 border-yellow-200",
     CONFIRMED: "bg-indigo-100 text-indigo-800 border-indigo-200",
     READY_FOR_DELIVERY: "bg-blue-100 text-blue-800 border-blue-200",
@@ -67,7 +68,7 @@ export default function AdminOrders() {
 
             {/* Filter Pills in Header */}
             <div className="bg-white/10 backdrop-blur-md p-1 rounded-xl border border-white/10 flex overflow-x-auto max-w-full">
-              {["ALL", "PENDING", "CONFIRMED", "READY_FOR_DELIVERY", "SHIPPED", "DELIVERED"].map(f => (
+              {["ALL", "NEW", "PENDING", "CONFIRMED", "READY_FOR_DELIVERY", "SHIPPED", "DELIVERED"].map(f => (
                 <button
                   key={f}
                   onClick={() => setFilter(f)}
@@ -155,12 +156,12 @@ export default function AdminOrders() {
 
                   {/* Actions */}
                   <div className="flex items-center gap-3 w-full md:w-auto mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-t-0 border-gray-100 justify-end">
-                    {order.status === 'PENDING' && (
+                    {order.status === 'NEW' && (
                       <button
                         onClick={() => updateStatus(order.id, 'CONFIRMED')}
-                        className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 font-bold rounded-lg hover:bg-green-100 transition-colors shadow-sm"
+                        className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-colors shadow-lg shadow-green-500/30"
                       >
-                        <Check size={16} /> Confirm
+                        <Check size={16} /> Confirm Order
                       </button>
                     )}
                     <a
@@ -187,5 +188,3 @@ export default function AdminOrders() {
     </Layout>
   );
 }
-
-

@@ -86,7 +86,7 @@ public class OrderService {
 			order.setAddress(address);
 			order.setPhone(phone);
 			order.setPaymentMethod(paymentMethod != null ? paymentMethod : "CARD");
-			order.setStatus("PENDING");
+			order.setStatus("NEW");
 
 			Order savedOrder = repo.save(order);
 			createdOrders.add(savedOrder);
@@ -94,28 +94,57 @@ public class OrderService {
 			for (CartItem ci : vendorItems) {
 				ci.setOrder(savedOrder);
 				cartRepo.save(ci); // Update cart item with order link
-
-				// Notify Vendor (if exists)
-				if (ci.getBook().getVendor() != null) {
-					String msg = "New Order #" + savedOrder.getId() + ": " + ci.getQuantity() + " x "
-							+ ci.getBook().getTitle();
-					com.example.book.model.Notification n = new com.example.book.model.Notification(msg,
-							ci.getBook().getVendor());
-					notificationRepo.save(n);
-
-					// WebSocket
-					webSocketService.notifyVendorNewOrder(ci.getBook().getVendor().getId(), enrichOrder(savedOrder));
-					webSocketService.notifyVendor(ci.getBook().getVendor().getId(), msg);
-				}
 			}
 
 			// Initial History
-			OrderHistory history = new OrderHistory("PENDING", savedOrder);
+			OrderHistory history = new OrderHistory("NEW", savedOrder);
 			historyRepo.save(history);
 			savedOrder.getHistory().add(history);
 		}
 
 		return createdOrders.stream().map(this::enrichOrder).collect(Collectors.toList());
+	}
+
+	// ------------------ ADMIN CONFIRM ORDER ------------------
+	public Order adminConfirmOrder(Long orderId) {
+		Order order = repo.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+
+		if (!"NEW".equals(order.getStatus())) {
+			throw new RuntimeException("Order is not in NEW status");
+		}
+
+		boolean isVendorOrder = order.getItems().stream().anyMatch(i -> i.getBook().getVendor() != null);
+
+		String nextStatus = isVendorOrder ? "PENDING" : "READY_FOR_DELIVERY";
+		order.setStatus(nextStatus);
+
+		OrderHistory h = new OrderHistory(nextStatus, order);
+		historyRepo.save(h);
+		order.getHistory().add(h);
+
+		Order saved = repo.save(order);
+		Order enriched = enrichOrder(saved);
+
+		// Notify Logic
+		if (isVendorOrder) {
+			// Find Vendor and Notify
+			// Since order is split by vendor, we can just grab first item's vendor
+			com.example.book.model.Vendor vendor = order.getItems().get(0).getBook().getVendor();
+			if (vendor != null) {
+				String msg = "Order #" + order.getId() + " confirmed by Admin. Please process.";
+				com.example.book.model.Notification n = new com.example.book.model.Notification(msg, vendor);
+				notificationRepo.save(n);
+
+				webSocketService.notifyVendorNewOrder(vendor.getId(), enriched);
+				webSocketService.notifyVendor(vendor.getId(), msg);
+			}
+		} else {
+			// Platform Order -> Ready for Delivery
+			// Maybe notify Delivery Agents? (Optional, as they usually poll or see
+			// Available list)
+		}
+
+		return enriched;
 	}
 
 	// ------------------ UPDATE STATUS ------------------
