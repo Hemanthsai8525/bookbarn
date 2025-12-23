@@ -31,6 +31,9 @@ public class Order {
 	private String status; // PENDING, CONFIRMED, SHIPPED, PICKED_UP, DELIVERED, CANCELLED
 	private String paymentMethod; // CARD, COD
 
+	@com.fasterxml.jackson.annotation.JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	private java.time.LocalDateTime createdAt = java.time.LocalDateTime.now();
+
 	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
 	@JsonManagedReference
 	private List<OrderHistory> history = new ArrayList<>();
@@ -125,6 +128,14 @@ public class Order {
 
 	public void setItems(List<CartItem> items) {
 		this.items = items;
+	}
+
+	public java.time.LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(java.time.LocalDateTime createdAt) {
+		this.createdAt = createdAt;
 	}
 
 }

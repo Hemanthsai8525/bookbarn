@@ -106,6 +106,7 @@ public class OrderService {
 	}
 
 	// ------------------ ADMIN CONFIRM ORDER ------------------
+	@jakarta.transaction.Transactional
 	public Order adminConfirmOrder(Long orderId) {
 		Order order = repo.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
 

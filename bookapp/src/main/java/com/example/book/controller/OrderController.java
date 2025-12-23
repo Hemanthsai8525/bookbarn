@@ -86,8 +86,12 @@ public class OrderController {
     }
 
     @PostMapping("/{id}/confirm")
-    public Order confirmOrder(@PathVariable Long id) {
-        return svc.adminConfirmOrder(id);
+    public org.springframework.http.ResponseEntity<?> confirmOrder(@PathVariable Long id) {
+        try {
+            return org.springframework.http.ResponseEntity.ok(svc.adminConfirmOrder(id));
+        } catch (Exception e) {
+            return org.springframework.http.ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
 }
