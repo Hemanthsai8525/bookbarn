@@ -4,11 +4,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "../services/api";
 
-function friendlyDate(iso) {
+function friendlyDate(ts) {
+  if (!ts) return "";
   try {
-    return new Date(iso).toLocaleString();
+    return new Date(String(ts).replace(" ", "T")).toLocaleString();
   } catch {
-    return iso || "";
+    return ts || "";
   }
 }
 
@@ -31,7 +32,11 @@ export default function DeliveryOrderDetails() {
       const ord = res.data;
       // sort history ascending by time
       if (Array.isArray(ord.history)) {
-        ord.history = ord.history.slice().sort((a, b) => new Date(a.time) - new Date(b.time));
+        ord.history = ord.history.slice().sort((a, b) => {
+          const ta = new Date((a.timestamp || "").replace(" ", "T")).getTime();
+          const tb = new Date((b.timestamp || "").replace(" ", "T")).getTime();
+          return ta - tb;
+        });
       }
       setOrder(ord);
     } catch (err) {
@@ -100,7 +105,7 @@ export default function DeliveryOrderDetails() {
 
   const currentStatus = (order.status || "PENDING").toUpperCase();
   const timeline = Array.isArray(order.history) && order.history.length ? order.history : [
-    { status: currentStatus, time: new Date().toISOString() }
+    { status: currentStatus, timestamp: new Date().toISOString() }
   ];
 
   return (
@@ -243,8 +248,8 @@ export default function DeliveryOrderDetails() {
               disabled={!canMarkShipped() || updating}
               onClick={() => updateStatus("SHIPPED")}
               className={`px-6 py-3 rounded-xl font-bold transition-all duration-300 ${canMarkShipped()
-                  ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:shadow-lg hover:shadow-blue-500/50"
-                  : "bg-gray-200 text-gray-500 cursor-not-allowed"
+                ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:shadow-lg hover:shadow-blue-500/50"
+                : "bg-gray-200 text-gray-500 cursor-not-allowed"
                 }`}
             >
               📦 Mark Shipped
@@ -256,8 +261,8 @@ export default function DeliveryOrderDetails() {
               disabled={!canMarkOutForDelivery() || updating}
               onClick={() => updateStatus("OUT_FOR_DELIVERY")}
               className={`px-6 py-3 rounded-xl font-bold transition-all duration-300 ${canMarkOutForDelivery()
-                  ? "bg-gradient-to-r from-amber-600 to-amber-700 text-white hover:shadow-lg hover:shadow-amber-500/50"
-                  : "bg-gray-200 text-gray-500 cursor-not-allowed"
+                ? "bg-gradient-to-r from-amber-600 to-amber-700 text-white hover:shadow-lg hover:shadow-amber-500/50"
+                : "bg-gray-200 text-gray-500 cursor-not-allowed"
                 }`}
             >
               🚚 Mark Out for Delivery
@@ -269,8 +274,8 @@ export default function DeliveryOrderDetails() {
               disabled={!canMarkDelivered() || updating}
               onClick={() => updateStatus("DELIVERED")}
               className={`px-6 py-3 rounded-xl font-bold transition-all duration-300 ${canMarkDelivered()
-                  ? "bg-gradient-to-r from-green-600 to-green-700 text-white hover:shadow-lg hover:shadow-green-500/50"
-                  : "bg-gray-200 text-gray-500 cursor-not-allowed"
+                ? "bg-gradient-to-r from-green-600 to-green-700 text-white hover:shadow-lg hover:shadow-green-500/50"
+                : "bg-gray-200 text-gray-500 cursor-not-allowed"
                 }`}
             >
               ✅ Mark Delivered
@@ -303,7 +308,7 @@ export default function DeliveryOrderDetails() {
                   <span className="absolute -left-[9px] flex h-4 w-4 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 ring-4 ring-white" />
                   <div className="bg-gradient-to-br from-indigo-50 to-purple-50 p-4 rounded-xl border border-indigo-100">
                     <div className="font-bold text-gray-900 mb-1">{t.status}</div>
-                    <div className="text-sm text-gray-600">{friendlyDate(t.time)}</div>
+                    <div className="text-sm text-gray-600">{friendlyDate(t.timestamp)}</div>
                   </div>
                 </motion.li>
               );

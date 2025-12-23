@@ -70,7 +70,11 @@ export default function OrderDetails() {
 
   function buildTimeline(ord) {
     if (!ord || !Array.isArray(ord.history) || ord.history.length === 0) return [];
-    return ord.history.sort((a, b) => new Date(a.time) - new Date(b.time));
+    return ord.history.sort((a, b) => {
+      const ta = new Date((a.timestamp || "").replace(" ", "T")).getTime();
+      const tb = new Date((b.timestamp || "").replace(" ", "T")).getTime();
+      return ta - tb;
+    });
   }
 
   async function downloadInvoicePDF() {
@@ -128,7 +132,7 @@ export default function OrderDetails() {
                   <div>
                     <h1 className="text-3xl font-bold font-serif text-gray-900">Order #{order.id}</h1>
                     <div className="flex items-center gap-2 text-gray-500 mt-2 text-sm">
-                      <Clock size={14} /> Placed on {new Date().toLocaleDateString()} {/* No date in mock data usually, using current if missing for demo */}
+                      <Clock size={14} /> Placed on {order.createdAt ? new Date(String(order.createdAt).replace(' ', 'T')).toLocaleString() : new Date().toLocaleString()}
                     </div>
                   </div>
                   <div className={`px-4 py-2 rounded-full font-bold text-sm border flex items-center gap-2 ${statusColor(currentStatus)}`}>
@@ -275,7 +279,7 @@ export default function OrderDetails() {
                           {step.status}
                         </h4>
                         <time className="block mb-2 text-xs font-normal leading-none text-gray-400">
-                          {new Date(step.time).toLocaleString()}
+                          {step.timestamp ? new Date(String(step.timestamp).replace(' ', 'T')).toLocaleString() : ''}
                         </time>
                       </li>
                     ))}
