@@ -33,6 +33,9 @@ public class VendorController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private com.example.book.service.WebSocketService webSocketService;
+
     // Public Registration
     @PostMapping("/vendors/register")
     public ResponseEntity<?> register(@RequestBody VendorDto dto) {
@@ -165,7 +168,10 @@ public class VendorController {
         // Link book to vendor
         book.setVendor(vendor);
         try {
-            return ResponseEntity.ok(bookRepository.save(book));
+            com.example.book.model.Book savedBook = bookRepository.save(book);
+            // Send real-time inventory update
+            webSocketService.notifyVendorInventoryUpdate(vendor.getId(), savedBook);
+            return ResponseEntity.ok(savedBook);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error adding book: " + e.getMessage());
         }
@@ -189,7 +195,10 @@ public class VendorController {
             book.setStock(updatedBook.getStock());
             book.setDescription(updatedBook.getDescription());
             book.setImage(updatedBook.getImage());
-            return ResponseEntity.ok(bookRepository.save(book));
+            com.example.book.model.Book savedBook = bookRepository.save(book);
+            // Send real-time inventory update
+            webSocketService.notifyVendorInventoryUpdate(vendor.getId(), savedBook);
+            return ResponseEntity.ok(savedBook);
         }).orElse(ResponseEntity.notFound().build());
     }
 
@@ -203,6 +212,8 @@ public class VendorController {
                 return ResponseEntity.status(403).body("Unauthorized to delete this book");
             }
             bookRepository.delete(book);
+            // Send real-time inventory update (book deleted)
+            webSocketService.notifyVendorInventoryUpdate(vendor.getId(), book);
             return ResponseEntity.ok("Book deleted successfully");
         }).orElse(ResponseEntity.notFound().build());
     }

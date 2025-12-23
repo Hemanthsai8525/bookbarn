@@ -1,5 +1,6 @@
 ﻿import React, { useEffect, useState } from "react";
 import api from "../services/api";
+import wsClient from "../services/websocket";
 import { useNavigate } from "react-router-dom";
 import { BookOpen, LogOut, Package, Plus, Search, DollarSign, Image as ImageIcon, X, TrendingUp, Edit2, Trash2, ShoppingBag, CheckCircle, RefreshCw, Bell } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -22,18 +23,102 @@ export default function VendorDashboard() {
     const [notifications, setNotifications] = useState([]);
     const [orders, setOrders] = useState([]);
     const [activeTab, setActiveTab] = useState("inventory"); // inventory | orders
+    const [vendorId, setVendorId] = useState(null);
+    const [wsConnected, setWsConnected] = useState(false);
 
-    // Poll for notifications
+    // Initialize WebSocket connection
     useEffect(() => {
-        if (!token) return;
+        if (!token) {
+            navigate("/login");
+            return;
+        }
 
-        // Initial fetch
-        fetchNotifications();
+        // Get vendor profile to get vendor ID
+        const initializeVendor = async () => {
+            try {
+                const profileRes = await api.get("/vendor/profile");
+                const vId = profileRes.data.id;
+                setVendorId(vId);
 
-        // Poll every 30 seconds
-        const interval = setInterval(fetchNotifications, 30000);
-        return () => clearInterval(interval);
-    }, [token]);
+                // Connect to WebSocket
+                wsClient.connect(
+                    () => {
+                        console.log('WebSocket connected for vendor:', vId);
+                        setWsConnected(true);
+
+                        // Subscribe to vendor-specific topics
+                        wsClient.subscribe(`/topic/vendor/${vId}`, handleWebSocketMessage);
+                    },
+                    (error) => {
+                        console.error('WebSocket connection error:', error);
+                        setWsConnected(false);
+                    }
+                );
+            } catch (err) {
+                console.error("Failed to initialize vendor", err);
+            }
+        };
+
+        initializeVendor();
+
+        // Cleanup on unmount
+        return () => {
+            wsClient.disconnect();
+        };
+    }, [token, navigate]);
+
+    // Handle incoming WebSocket messages
+    const handleWebSocketMessage = (data) => {
+        console.log('📨 Received WebSocket message:', data);
+
+        switch (data.type) {
+            case 'NEW_ORDER':
+                // Add new order to the list
+                setOrders(prev => [data.payload, ...prev]);
+                // Show notification
+                setMessage(`🎉 New order received! Order #${data.payload.id}`);
+                setTimeout(() => setMessage(""), 5000);
+                // Play notification sound (optional)
+                playNotificationSound();
+                break;
+
+            case 'ORDER_UPDATE':
+                // Update existing order
+                setOrders(prev => prev.map(o =>
+                    o.id === data.payload.id ? data.payload : o
+                ));
+                break;
+
+            case 'INVENTORY_UPDATE':
+                // Update books list
+                fetchMyBooks();
+                break;
+
+            case 'NOTIFICATION':
+                // Add notification
+                const newNotification = {
+                    id: Date.now(),
+                    message: data.payload.message,
+                    timestamp: new Date(data.payload.timestamp),
+                    isRead: false
+                };
+                setNotifications(prev => [newNotification, ...prev]);
+                break;
+
+            default:
+                console.log('Unknown message type:', data.type);
+        }
+    };
+
+    // Optional: Play notification sound
+    const playNotificationSound = () => {
+        try {
+            const audio = new Audio('/notification.mp3'); // Add a notification sound file
+            audio.play().catch(e => console.log('Could not play sound:', e));
+        } catch (e) {
+            console.log('Notification sound not available');
+        }
+    };
 
     useEffect(() => {
         if (!token) {
@@ -43,16 +128,6 @@ export default function VendorDashboard() {
         fetchMyBooks();
         fetchNotifications();
         fetchOrders(); // Initial fetch
-    }, [token]);
-
-    // Poll orders every 30s as well
-    useEffect(() => {
-        if (!token) return;
-        const interval = setInterval(() => {
-            fetchNotifications();
-            fetchOrders();
-        }, 30000);
-        return () => clearInterval(interval);
     }, [token]);
 
     const fetchNotifications = async () => {
@@ -193,8 +268,18 @@ export default function VendorDashboard() {
     return (
         <div className="min-h-screen bg-[#F8F9FA] font-sans pb-20">
 
-
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+                {/* WebSocket Connection Status */}
+                <div className="mb-6 flex justify-end">
+                    <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition-all ${wsConnected
+                            ? 'bg-green-50 text-green-700 border border-green-200'
+                            : 'bg-red-50 text-red-700 border border-red-200'
+                        }`}>
+                        <div className={`w-2 h-2 rounded-full ${wsConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
+                        {wsConnected ? '🟢 Live Updates Active' : '🔴 Connecting...'}
+                    </div>
+                </div>
 
                 {/* Stats Row */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">

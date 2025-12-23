@@ -23,11 +23,13 @@ public class OrderService {
 	private final BookService bookService;
 	private final com.example.book.repository.DeliveryAgentRepository deliveryRepo;
 	private final com.example.book.repository.NotificationRepository notificationRepo;
+	private final WebSocketService webSocketService;
 
 	public OrderService(OrderRepository repo, CartRepository cartRepo, BookRepository bookRepo,
 			OrderHistoryRepository historyRepo, BookService bookService,
 			com.example.book.repository.NotificationRepository notificationRepo,
-			com.example.book.repository.DeliveryAgentRepository deliveryRepo) {
+			com.example.book.repository.DeliveryAgentRepository deliveryRepo,
+			WebSocketService webSocketService) {
 		this.repo = repo;
 		this.cartRepo = cartRepo;
 		this.bookRepo = bookRepo;
@@ -35,6 +37,7 @@ public class OrderService {
 		this.bookService = bookService;
 		this.notificationRepo = notificationRepo;
 		this.deliveryRepo = deliveryRepo;
+		this.webSocketService = webSocketService;
 	}
 
 	// ------------------ PLACE ORDER ------------------
@@ -83,6 +86,10 @@ public class OrderService {
 				com.example.book.model.Notification n = new com.example.book.model.Notification(msg,
 						ci.getBook().getVendor());
 				notificationRepo.save(n);
+
+				// Send real-time WebSocket notification to vendor
+				webSocketService.notifyVendorNewOrder(ci.getBook().getVendor().getId(), enrichOrder(savedOrder));
+				webSocketService.notifyVendor(ci.getBook().getVendor().getId(), msg);
 			}
 		}
 
@@ -107,9 +114,23 @@ public class OrderService {
 
 		order.getHistory().add(history);
 
-		// If status is SHIPPED, notify User? (Optional future enhancement)
+		Order savedOrder = repo.save(order);
+		Order enrichedOrder = enrichOrder(savedOrder);
 
-		return repo.save(order);
+		// Send real-time updates to user
+		if (order.getUserId() != null) {
+			webSocketService.notifyUserOrderUpdate(order.getUserId(), enrichedOrder);
+		}
+
+		// Notify vendors about order status changes
+		List<CartItem> items = cartRepo.findByOrderId(orderId);
+		for (CartItem ci : items) {
+			if (ci.getBook() != null && ci.getBook().getVendor() != null) {
+				webSocketService.notifyVendorOrderUpdate(ci.getBook().getVendor().getId(), enrichedOrder);
+			}
+		}
+
+		return enrichedOrder;
 	}
 
 	public Order confirmOrder(Long orderId) {
@@ -173,7 +194,28 @@ public class OrderService {
 		historyRepo.save(h);
 		order.getHistory().add(h);
 
-		return repo.save(order);
+		Order savedOrder = repo.save(order);
+		Order enrichedOrder = enrichOrder(savedOrder);
+
+		// Send real-time notification to delivery agent
+		webSocketService.notifyDeliveryAgentNewAssignment(agentId, enrichedOrder);
+
+		// Notify user about shipment
+		if (order.getUserId() != null) {
+			webSocketService.notifyUserOrderUpdate(order.getUserId(), enrichedOrder);
+		}
+
+		// Notify vendor that order has been picked up
+		List<CartItem> items = cartRepo.findByOrderId(orderId);
+		for (CartItem ci : items) {
+			if (ci.getBook() != null && ci.getBook().getVendor() != null) {
+				webSocketService.notifyVendorOrderUpdate(ci.getBook().getVendor().getId(), enrichedOrder);
+				webSocketService.notifyVendor(ci.getBook().getVendor().getId(),
+						"Order #" + orderId + " has been picked up by " + agent.getName());
+			}
+		}
+
+		return enrichedOrder;
 	}
 
 	public List<Order> findByAgentId(Long agentId) {
