@@ -1,6 +1,10 @@
 package com.example.book.service;
 
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -42,7 +46,7 @@ public class OrderService {
 
 	// ------------------ PLACE ORDER ------------------
 	@jakarta.transaction.Transactional
-	public Order placeOrder(Long userId, String address, String phone, String paymentMethod) {
+	public List<Order> placeOrder(Long userId, String address, String phone, String paymentMethod) {
 
 		if (userId == null)
 			throw new RuntimeException("Invalid user");
@@ -51,53 +55,69 @@ public class OrderService {
 		if (items.isEmpty())
 			throw new RuntimeException("No items in cart");
 
-		double total = 0;
-
+		// 1. Validate & Deduct Stock
 		for (CartItem ci : items) {
 			Book b = bookRepo.findById(ci.getBookId())
 					.orElseThrow(() -> new RuntimeException("Book not found: " + ci.getBookId()));
-
-			ci.setBook(b); // Ensure book is available for later steps
-
-			// Check and deduct stock
+			ci.setBook(b);
 			bookService.deductStock(ci.getBookId(), ci.getQuantity());
-
-			total += b.getPrice() * ci.getQuantity();
 		}
 
-		Order order = new Order();
-		order.setUserId(userId);
-		order.setTotal(total);
-		order.setAddress(address);
-		order.setPhone(phone);
-		order.setPaymentMethod(paymentMethod != null ? paymentMethod : "CARD"); // Default to CARD if null
-		order.setStatus("PENDING");
-
-		Order savedOrder = repo.save(order);
-
+		// 2. Group Items by Vendor
+		Map<Long, List<CartItem>> itemsByVendor = new HashMap<>();
 		for (CartItem ci : items) {
-			ci.setOrder(savedOrder);
-			cartRepo.save(ci);
-
-			// Notify Vendor
-			if (ci.getBook() != null && ci.getBook().getVendor() != null) {
-				String msg = "New Order #" + savedOrder.getId() + ": " + ci.getQuantity() + " x "
-						+ ci.getBook().getTitle();
-				com.example.book.model.Notification n = new com.example.book.model.Notification(msg,
-						ci.getBook().getVendor());
-				notificationRepo.save(n);
-
-				// Send real-time WebSocket notification to vendor
-				webSocketService.notifyVendorNewOrder(ci.getBook().getVendor().getId(), enrichOrder(savedOrder));
-				webSocketService.notifyVendor(ci.getBook().getVendor().getId(), msg);
-			}
+			Long vId = (ci.getBook().getVendor() != null) ? ci.getBook().getVendor().getId() : 0L; // 0L for
+																									// Admin/Platform
+																									// items
+			itemsByVendor.computeIfAbsent(vId, k -> new ArrayList<>()).add(ci);
 		}
 
-		OrderHistory history = new OrderHistory("PENDING", savedOrder);
-		historyRepo.save(history);
-		savedOrder.getHistory().add(history);
+		List<Order> createdOrders = new ArrayList<>();
 
-		return enrichOrder(savedOrder);
+		// 3. Create Order for Each Vendor group
+		for (Map.Entry<Long, List<CartItem>> entry : itemsByVendor.entrySet()) {
+			List<CartItem> vendorItems = entry.getValue();
+
+			double groupTotal = vendorItems.stream()
+					.mapToDouble(i -> i.getBook().getPrice() * i.getQuantity())
+					.sum();
+
+			Order order = new Order();
+			order.setUserId(userId);
+			order.setTotal(groupTotal);
+			order.setAddress(address);
+			order.setPhone(phone);
+			order.setPaymentMethod(paymentMethod != null ? paymentMethod : "CARD");
+			order.setStatus("PENDING");
+
+			Order savedOrder = repo.save(order);
+			createdOrders.add(savedOrder);
+
+			for (CartItem ci : vendorItems) {
+				ci.setOrder(savedOrder);
+				cartRepo.save(ci); // Update cart item with order link
+
+				// Notify Vendor (if exists)
+				if (ci.getBook().getVendor() != null) {
+					String msg = "New Order #" + savedOrder.getId() + ": " + ci.getQuantity() + " x "
+							+ ci.getBook().getTitle();
+					com.example.book.model.Notification n = new com.example.book.model.Notification(msg,
+							ci.getBook().getVendor());
+					notificationRepo.save(n);
+
+					// WebSocket
+					webSocketService.notifyVendorNewOrder(ci.getBook().getVendor().getId(), enrichOrder(savedOrder));
+					webSocketService.notifyVendor(ci.getBook().getVendor().getId(), msg);
+				}
+			}
+
+			// Initial History
+			OrderHistory history = new OrderHistory("PENDING", savedOrder);
+			historyRepo.save(history);
+			savedOrder.getHistory().add(history);
+		}
+
+		return createdOrders.stream().map(this::enrichOrder).collect(Collectors.toList());
 	}
 
 	// ------------------ UPDATE STATUS ------------------

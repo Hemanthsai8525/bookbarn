@@ -65,6 +65,23 @@ export default function VendorOrderDetails() {
         }
     };
 
+    const formatTime = (ts) => {
+        if (!ts) return 'N/A';
+        try {
+            // Handle "yyyy-MM-dd HH:mm:ss" by replacing space with T
+            const dateStr = String(ts).replace(' ', 'T');
+            const date = new Date(dateStr);
+            if (isNaN(date.getTime())) return 'Invalid Date';
+
+            return date.toLocaleString('en-IN', {
+                dateStyle: 'medium',
+                timeStyle: 'short'
+            });
+        } catch (e) {
+            return 'Invalid Date';
+        }
+    };
+
     if (loading) {
         return (
             <div className="min-h-screen bg-[#F8F9FA] flex items-center justify-center">
@@ -109,10 +126,7 @@ export default function VendorOrderDetails() {
                         <div>
                             <h1 className="text-3xl font-bold text-gray-900">Order #{order.id}</h1>
                             <p className="text-gray-600 mt-1">
-                                Placed on {new Date(order.history?.[0]?.timestamp || Date.now()).toLocaleString('en-IN', {
-                                    dateStyle: 'medium',
-                                    timeStyle: 'short'
-                                })}
+                                Placed on {formatTime(order.history?.[0]?.timestamp || order.createdAt || Date.now())}
                             </p>
                         </div>
 
@@ -222,10 +236,7 @@ export default function VendorOrderDetails() {
                                             <div className="flex-1 pb-4">
                                                 <p className="font-bold text-gray-900">{h.status.replace(/_/g, ' ')}</p>
                                                 <p className="text-sm text-gray-600">
-                                                    {new Date(h.timestamp).toLocaleString('en-IN', {
-                                                        dateStyle: 'medium',
-                                                        timeStyle: 'short'
-                                                    })}
+                                                    {formatTime(h.timestamp)}
                                                 </p>
                                             </div>
                                         </div>

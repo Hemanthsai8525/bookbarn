@@ -35,7 +35,7 @@ export default function VendorDashboard() {
 
     const getTimeAgo = (date) => {
         if (!date) return '';
-        const d = new Date(date);
+        const d = new Date(String(date).replace(' ', 'T'));
         const seconds = Math.floor((currentTime - d) / 1000);
         if (seconds < 60) return 'Just now';
         const minutes = Math.floor(seconds / 60);

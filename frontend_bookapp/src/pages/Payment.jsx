@@ -85,12 +85,14 @@ export default function Payment() {
         paymentMethod: paymentMethod // Send selected method
       });
 
-      const order = orderRes.data;
+      // Handle split orders (Array) or single order (Object)
+      const orders = Array.isArray(orderRes.data) ? orderRes.data : [orderRes.data];
+      const orderIdStr = orders.map(o => o.id).join(", ");
 
       // FAKE PAYMENT RECORD
       const paymentData = {
         paymentId: paymentMethod === 'COD' ? 'COD' : "TXN-" + Math.random().toString(36).substr(2, 9).toUpperCase(),
-        orderId: `ORD-${order.id}`,
+        orderId: `ORD-${orderIdStr}`,
         status: "success",
         method: paymentMethod
       };
