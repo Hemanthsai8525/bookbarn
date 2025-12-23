@@ -65,12 +65,7 @@ export default function Checkout() {
       try {
         // Using OpenStreetMap's Nominatim API for reverse geocoding
         const response = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`,
-          {
-            headers: {
-              'User-Agent': 'BookBarn App'
-            }
-          }
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`
         );
         const data = await response.json();
 
@@ -290,6 +285,8 @@ export default function Checkout() {
               </div>
 
               <button
+                id="checkout-next-step"
+                data-testid="checkout-next-step-btn"
                 onClick={confirmOrder}
                 className="w-full bg-gray-900 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-amber-700 hover:shadow-xl hover:scale-[1.02] transform transition-all flex items-center justify-center gap-2"
               >

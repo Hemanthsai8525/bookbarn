@@ -2,12 +2,18 @@
 import api from "../services/api";
 import Layout from "../components/Layout";
 import { useNavigate, useLocation } from "react-router-dom";
-import { CheckCircle, Package } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 
 export default function OrderSummary() {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = JSON.parse(localStorage.getItem("user") || "null");
   const navigate = useNavigate();
   const { state } = useLocation();
+
+  if (!state && !localStorage.getItem("user")) {
+    // Safety for automation/lost state
+    window.location.href = "/";
+    return null;
+  }
 
   const isBuyNow = state?.items && state.items.length > 0;
 
@@ -24,24 +30,33 @@ export default function OrderSummary() {
   }, []);
 
   function loadBuyNow() {
-    setItems(state.items);
+    if (state?.items) {
+      setItems(state.items);
+    }
     setLoading(false);
   }
 
   async function loadCartSummary() {
+    if (!user || !user.id) {
+      setLoading(false);
+      return;
+    }
     try {
       const cartRes = await api.get(`/cart/${user.id}`);
-      setItems(cartRes.data);
-      if (cartRes.data.length > 0) {
+      const cartItems = cartRes.data || [];
+      setItems(cartItems);
+      if (cartItems.length > 0) {
         try {
           const bRes = await api.get("/books");
           const bookMap = {};
-          bRes.data.forEach(b => bookMap[b.id] = b);
+          if (Array.isArray(bRes.data)) {
+            bRes.data.forEach(b => bookMap[b.id] = b);
+          }
           setBooks(bookMap);
-        } catch (e) { }
+        } catch (e) { console.error("Books load error", e); }
       }
     } catch (err) {
-      console.error(err);
+      console.error("Cart summary error", err);
     } finally {
       setLoading(false);
     }
@@ -77,11 +92,14 @@ export default function OrderSummary() {
               <h2 className="text-xl font-bold text-gray-800 mb-6 border-b pb-4">Items Review</h2>
 
               <div className="space-y-6">
-                {items.map((item, idx) => {
+                {items.length === 0 ? (
+                  <p className="text-gray-500 text-center py-4">No items to review.</p>
+                ) : items.map((item, idx) => {
                   const details = getItemDetails(item);
                   return (
                     <div key={idx} className="flex gap-4 items-center">
                       <img
+                        referrerPolicy="no-referrer"
                         src={details.image?.startsWith('http') ? details.image : `https://bookapp-production-3e11.up.railway.app${details.image}`}
                         className="w-16 h-20 object-cover rounded-md shadow-sm bg-gray-100"
                         alt=""
@@ -125,12 +143,16 @@ export default function OrderSummary() {
               </div>
 
               <button
+                type="button"
+                id="proceed-to-payment"
+                data-testid="proceed-to-payment-btn"
                 onClick={() => navigate("/checkout", { state: { items, subtotal, shipping, tax, total, buyNow: isBuyNow } })}
-                className="w-full btn-primary py-4 text-lg shadow-lg hover:shadow-xl hover:scale-[1.02] transform transition-all"
+                className="w-full btn-primary py-4 text-lg shadow-lg hover:shadow-xl hover:scale-[1.02] transform transition-all flex items-center justify-center font-bold"
               >
                 Proceed to Payment
               </button>
               <button
+                type="button"
                 onClick={() => navigate("/")}
                 className="w-full mt-4 text-gray-500 hover:text-gray-900 font-medium text-sm"
               >
