@@ -371,24 +371,22 @@ export default function VendorDashboard() {
                         </button>
                     </div>
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                        {notifications.length === 0 ? (
+                        {notifications.filter(n => !n.isRead).length === 0 ? (
                             <div className="p-12 text-center text-gray-500 flex flex-col items-center">
                                 <Bell size={40} className="text-gray-200 mb-3" />
                                 <p className="font-medium">No new alerts</p>
                             </div>
                         ) : (
                             <div className="divide-y divide-gray-100 max-h-80 overflow-y-auto">
-                                {notifications.map((n) => (
+                                {notifications.filter(n => !n.isRead).map((n) => (
                                     <div
                                         key={n.id}
-                                        onClick={() => !n.isRead && markNotificationRead(n.id)}
-                                        className={`p-4 hover:bg-gray-50 flex items-start gap-4 transition-colors cursor-pointer relative ${!n.isRead ? 'bg-blue-50/20' : ''}`}
+                                        onClick={() => markNotificationRead(n.id)}
+                                        className="p-4 hover:bg-gray-50 flex items-start gap-4 transition-colors cursor-pointer relative bg-blue-50/20"
                                     >
-                                        {!n.isRead && (
-                                            <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-blue-600 flex-shrink-0" />
-                                        )}
-                                        <div className={!n.isRead ? '' : 'pl-3'}>
-                                            <p className={`text-sm leading-relaxed ${!n.isRead ? 'text-gray-900 font-bold' : 'text-gray-600 font-medium'}`}>
+                                        <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-blue-600 flex-shrink-0" />
+                                        <div>
+                                            <p className="text-sm leading-relaxed text-gray-900 font-bold">
                                                 {n.message}
                                             </p>
                                             <p className="text-xs text-gray-400 mt-2 font-bold uppercase tracking-wider">

@@ -278,22 +278,20 @@ export default function Navbar() {
                             )}
                           </div>
                           <div className="max-h-[350px] overflow-y-auto">
-                            {notifications.length === 0 ? (
+                            {notifications.filter(n => !n.isRead).length === 0 ? (
                               <div className="p-8 text-center">
                                 <Bell size={32} className="mx-auto text-gray-200 mb-3" />
                                 <p className="text-sm text-gray-400 font-medium">No system alerts</p>
                               </div>
                             ) : (
-                              notifications.map((n) => (
+                              notifications.filter(n => !n.isRead).map((n) => (
                                 <div
                                   key={n.id}
-                                  onClick={() => !n.isRead && markRead(n.id)}
-                                  className={`relative px-4 py-4 hover:bg-amber-50/30 border-b border-gray-50 last:border-0 transition-colors cursor-pointer group ${!n.isRead ? 'bg-amber-50/10' : ''}`}
+                                  onClick={() => markRead(n.id)}
+                                  className="relative px-4 py-4 hover:bg-amber-50/30 border-b border-gray-50 last:border-0 transition-colors cursor-pointer group bg-amber-50/10"
                                 >
-                                  {!n.isRead && (
-                                    <div className="absolute left-1.5 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-amber-600 rounded-full shadow-[0_0_8px_rgba(217,119,6,0.5)]"></div>
-                                  )}
-                                  <p className={`text-sm leading-relaxed ${!n.isRead ? 'text-gray-900 font-bold' : 'text-gray-600 font-medium'}`}>
+                                  <div className="absolute left-1.5 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-amber-600 rounded-full shadow-[0_0_8px_rgba(217,119,6,0.5)]"></div>
+                                  <p className="text-sm leading-relaxed text-gray-900 font-bold">
                                     {n.message}
                                   </p>
                                   <p className="text-[10px] text-gray-400 mt-2 font-bold uppercase tracking-wider">
