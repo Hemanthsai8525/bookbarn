@@ -1,4 +1,5 @@
 ﻿import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import api from "../services/api";
 import Layout from "../components/Layout";
 import { Search, Trash2, Check, ExternalLink, ChevronDown, Package, Truck, User, ShoppingBag, Filter } from "lucide-react";
@@ -164,13 +165,13 @@ export default function AdminOrders() {
                         <Check size={16} /> Confirm Order
                       </button>
                     )}
-                    <a
-                      href={`/orders/${order.id}`}
+                    <Link
+                      to={`/orders/${order.id}`}
                       className="p-2.5 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
                       title="View Details"
                     >
                       <ExternalLink size={20} />
-                    </a>
+                    </Link>
                     <button
                       onClick={() => deleteOrder(order.id)}
                       className="p-2.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"

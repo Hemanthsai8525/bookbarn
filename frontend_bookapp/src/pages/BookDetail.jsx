@@ -37,7 +37,7 @@ export default function BookDetail() {
     if (isDelivery) { alert("Delivery agents cannot place orders."); return; }
     if (isVendor) { alert("Vendor users cannot place orders."); return; }
     if (Number(book.stock) === 0) { alert("This book is out of stock."); return; }
-    if (!user) { window.location = "/login"; return; }
+    if (!user) { navigate("/login"); return; }
 
     try {
       await api.post("/cart", { userId: user.id, bookId: book.id, quantity: 1 });
@@ -59,7 +59,7 @@ export default function BookDetail() {
     if (isAdmin) { alert("Admin users cannot place orders."); return; }
     if (isDelivery) { alert("Delivery agents cannot place orders."); return; }
     if (Number(book.stock) === 0) { alert("This book is out of stock."); return; }
-    if (!user) { window.location = "/login"; return; }
+    if (!user) { navigate("/login"); return; }
 
     try {
       // Add to cart first (ensures stock check & sync)
