@@ -10,15 +10,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.book.model.Subscriber;
 import com.example.book.repository.SubscriberRepository;
+import com.example.book.service.EmailService;
 
 @RestController
 @RequestMapping("/newsletter")
 public class NewsletterController {
 
     private final SubscriberRepository repo;
+    private final EmailService emailService;
 
-    public NewsletterController(SubscriberRepository repo) {
+    public NewsletterController(SubscriberRepository repo, EmailService emailService) {
         this.repo = repo;
+        this.emailService = emailService;
     }
 
     @PostMapping("/subscribe")
@@ -34,6 +37,8 @@ public class NewsletterController {
 
         Subscriber sub = new Subscriber(email);
         repo.save(sub);
+
+        emailService.sendWelcomeEmail(email);
 
         return ResponseEntity.ok("Subscribed successfully!");
     }

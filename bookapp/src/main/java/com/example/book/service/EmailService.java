@@ -89,7 +89,7 @@ public class EmailService {
     /**
      * Send email using Brevo REST API
      */
-    private boolean sendEmailViaBrevo(String toEmail, String subject, String htmlContent) {
+    public boolean sendEmailViaBrevo(String toEmail, String subject, String htmlContent) {
         try {
             // Build request payload
             Map<String, Object> payload = new HashMap<>();
@@ -228,6 +228,43 @@ public class EmailService {
             return "No OTP found";
         }
         return "Expires at: " + data.getExpiryTime();
+    }
+
+    /**
+     * Send Newsletter Welcome Email
+     */
+    public void sendWelcomeEmail(String toEmail) {
+        String subject = "Welcome to BookBarn Newsletter! 📚";
+        String body = buildWelcomeEmailBody();
+        sendEmailViaBrevo(toEmail, subject, body);
+    }
+
+    private String buildWelcomeEmailBody() {
+        return "<html>" +
+                "<body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>" +
+                "<div style='max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;'>" +
+                "<div style='background-color: #d97706; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;'>"
+                +
+                "<h1 style='margin: 0;'>Welcome to BookBarn! 📚</h1>" +
+                "</div>" +
+                "<div style='background-color: white; padding: 30px; border-radius: 0 0 8px 8px;'>" +
+                "<h2>Subscription Successful!</h2>" +
+                "<p>Hello book lover,</p>" +
+                "<p>Thank you for subscribing to the BookBarn newsletter. You have successfully joined our community of readers.</p>"
+                +
+                "<p>From now on, you will be the first to know about:</p>" +
+                "<ul>" +
+                "<li>🚀 New Book Arrivals</li>" +
+                "<li>🔥 Exclusive Discounts & Offers</li>" +
+                "<li>📖 Author Interviews & Events</li>" +
+                "</ul>" +
+                "<p>Stay tuned for our next update!</p>" +
+                "<hr style='border: none; border-top: 1px solid #eee; margin: 30px 0;'>" +
+                "<p style='color: #999; font-size: 12px; text-align: center;'>Best regards,<br>The BookBarn Team</p>" +
+                "</div>" +
+                "</div>" +
+                "</body>" +
+                "</html>";
     }
 
     /**
