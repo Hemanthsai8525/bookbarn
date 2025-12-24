@@ -1,4 +1,5 @@
-﻿import React from "react";
+﻿import React, { useState } from "react";
+import api from "../services/api";
 import { Link } from "react-router-dom";
 import { BookOpen, Facebook, Twitter, Instagram, Linkedin, Send, Mail, MapPin, Phone } from "lucide-react";
 import { motion } from "framer-motion";
@@ -64,16 +65,7 @@ export default function Footer() {
           <div>
             <h3 className="text-white font-bold text-lg mb-6">Stay Updated</h3>
             <p className="text-gray-400 text-sm mb-4">Subscribe to get the latest book updates and exclusive offers.</p>
-            <form className="relative">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="w-full bg-gray-800 border border-gray-700 text-white pl-4 pr-12 py-3 rounded-xl focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-all placeholder:text-gray-500"
-              />
-              <button className="absolute right-2 top-2 p-1.5 bg-amber-500 text-gray-900 rounded-lg hover:bg-amber-400 transition-colors">
-                <Send size={18} />
-              </button>
-            </form>
+            <NewsletterForm />
           </div>
         </div>
 
@@ -92,3 +84,47 @@ export default function Footer() {
   );
 }
 
+function NewsletterForm() {
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState("idle"); // idle, loading, success, error
+  const [msg, setMsg] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!email) return;
+
+    setStatus("loading");
+    try {
+      await api.post("/newsletter/subscribe", { email });
+      setStatus("success");
+      setMsg("Subscribed successfully!");
+      setEmail("");
+    } catch (err) {
+      setStatus("error");
+      setMsg(err.response?.data || "Subscription failed");
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <form onSubmit={handleSubmit} className="relative">
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Enter your email"
+          disabled={status === "loading" || status === "success"}
+          className="w-full bg-gray-800 border border-gray-700 text-white pl-4 pr-12 py-3 rounded-xl focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-all placeholder:text-gray-500 disabled:opacity-50"
+        />
+        <button
+          disabled={status === "loading" || status === "success"}
+          className="absolute right-2 top-2 p-1.5 bg-amber-500 text-gray-900 rounded-lg hover:bg-amber-400 transition-colors disabled:opacity-50"
+        >
+          <Send size={18} />
+        </button>
+      </form>
+      {status === "success" && <p className="text-green-400 text-xs font-bold">{msg}</p>}
+      {status === "error" && <p className="text-red-400 text-xs font-bold">{msg}</p>}
+    </div>
+  );
+}
